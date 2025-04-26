@@ -20,7 +20,7 @@ public class RoomsController : ControllerBase
         _roomService = roomService;
     }
 
-    [HttpPost(Name = "Create")]
+    [HttpPost("Create")]
     public async Task<ActionResult> Create([FromBody] CreateRoomRequest createRoom)
     {
         await _roomService.CreateAsync(createRoom);
@@ -29,7 +29,7 @@ public class RoomsController : ControllerBase
 
     }
 
-    [HttpPut(Name = "Update")]
+    [HttpPut("Update")]
     public async Task<ActionResult> Update([FromBody] UpdateRoomRequest updateRoom)
     {
         await _roomService.UpdateAsync(updateRoom);
@@ -38,7 +38,7 @@ public class RoomsController : ControllerBase
 
     }
 
-    [HttpDelete(Name = "Delete")]
+    [HttpDelete( "Delete")]
     public async Task<ActionResult> Delete(int roomId)
     {
         await _roomService.DeleteAsync(roomId);
@@ -47,14 +47,14 @@ public class RoomsController : ControllerBase
 
     }
 
-    [HttpGet(Name = "GetByName")]
+    [HttpGet("GetByName")]
     public async Task<ActionResult<CreateRoomRequest>> GetByName(string name)
     {
         var room = await _roomService.GetByNameAsync(name);
         return Ok(room);
     }
 
-    [HttpGet(Name = "GetList")]
+    [HttpGet("GetList")]
     public async Task<ActionResult<List<CreateRoomRequest>>> GetList()
     {
         var rooms = await _roomService.GetListAsync();
