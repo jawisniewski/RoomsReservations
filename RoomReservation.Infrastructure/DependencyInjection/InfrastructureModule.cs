@@ -19,6 +19,9 @@ namespace RoomReservation.Infrastructure.DependencyInjection
                 options.UseSqlServer(connectionString));
 
             services.AddScoped(typeof(IRoomRepository), typeof(RoomRepository));
+            services.AddScoped(typeof(IReservationRepository), typeof(ReservationRepository));
+            services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+
             return services;
         }
     }

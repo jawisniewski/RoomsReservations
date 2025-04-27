@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.Interfaces.Repositories;
 using RoomReservation.Domain.Entities;
 using RoomReservation.Infrastructure.Context;
@@ -35,7 +36,7 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 _logger.LogError("Failed to create room");
 
-                return Result<Room>.Failure("Failed to create room");
+                return Result<Room>.Failure("Failed to create room", System.Net.HttpStatusCode.UnprocessableEntity);
             }
 
             return Result<Room>.Success(room);
@@ -50,7 +51,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 _logger.LogError($"Room not found ${roomId}");
 
 
-                return Result<bool>.Failure($"Room not found ${roomId}");
+                return Result<bool>.Failure($"Room not found ${roomId}", System.Net.HttpStatusCode.NotFound);
             }
 
             _dbSet.Remove(room);
@@ -61,7 +62,7 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 _logger.LogError($"Failed to delete room ${roomId}");
 
-                return Result<bool>.Failure($"Failed to delete room ${roomId}");
+                return Result<bool>.Failure($"Failed to delete room ${roomId}", System.Net.HttpStatusCode.UnprocessableEntity);
             }
 
             return Result<bool>.Success();
@@ -78,7 +79,7 @@ namespace RoomReservation.Infrastructure.Repositories
             if (room == null)
             {
                 _logger.LogError($"Room not found {name}");
-                return Result<Room>.Failure($"Room not found {name}");
+                return Result<Room>.Failure($"Room not found {name}", System.Net.HttpStatusCode.NotFound);
             }
 
             return Result<Room>.Success(room);
@@ -95,31 +96,71 @@ namespace RoomReservation.Infrastructure.Repositories
             if (rooms == null)
             {
                 _logger.LogError("Failed to get rooms");
-                return Result<List<Room>>.Failure("Failed to get rooms");
+                return Result<List<Room>>.Failure("Failed to get rooms", System.Net.HttpStatusCode.UnprocessableEntity);
             }
 
             if (rooms.Count == 0)
             {
                 _logger.LogError("No rooms found");
-                return Result<List<Room>>.Failure("No rooms found");
+                return Result<List<Room>>.Failure("No rooms found", System.Net.HttpStatusCode.NotFound);
             }
 
             return Result<List<Room>>.Success(rooms);
         }
 
-        public async Task<Result<Room>> UpdateAsync(Room room)
+        public async Task<Result<Room>> UpdateAsync(RoomDto roomDto)
         {
-            _dbSet.Update(room);
+            var roomEntity = await _dbSet
+                .Where(r => r.Id == roomDto.Id)
+                .Include(x => x.RoomReservationLimit)
+                .FirstOrDefaultAsync();
+
+            if (roomEntity == null)
+            {
+                _logger.LogError($"Room not found ${roomDto.Id}");
+                return Result<Room>.Failure($"Room not found ${roomDto.Id}", System.Net.HttpStatusCode.NotFound);
+            }
+
+            UpdateRoomProperties(roomDto, roomEntity);
+
+            UpdateRoomReservationLimit(roomDto, roomEntity);
 
             var result = await _context.SaveChangesAsync();
 
             if (result == 0)
             {
                 _logger.LogError("Failed to update room");
-                return Result<Room>.Failure("Failed to update room");
+                return Result<Room>.Failure("Failed to update room", System.Net.HttpStatusCode.UnprocessableEntity);
             }
 
-            return Result<Room>.Success(room);
+            return Result<Room>.Success(roomEntity);
+        }
+
+        private static void UpdateRoomProperties(RoomDto room, Room roomEntity)
+        {
+            roomEntity.Name = room.Name;
+            roomEntity.TableCount = room.TableCount;
+            roomEntity.Capacity = room.Capacity;
+            roomEntity.RoomLayout = room.RoomLayout;
+        }
+
+        private void UpdateRoomReservationLimit(RoomDto room, Room roomEntity)
+        {
+            if (room.RoomReservationLimit != null && roomEntity.RoomReservationLimit != null)
+            {
+                roomEntity.RoomReservationLimit.MinTime = room.RoomReservationLimit.MinTime;
+                roomEntity.RoomReservationLimit.MaxTime = room.RoomReservationLimit.MaxTime;
+            }
+            else if (room.RoomReservationLimit != null)
+            {
+                roomEntity.RoomReservationLimit = new RoomReservationLimit()
+                {
+                    RoomId = roomEntity.Id,
+                    Id = 0,
+                    MinTime = room.RoomReservationLimit.MinTime,
+                    MaxTime = room.RoomReservationLimit.MaxTime
+                };
+            }
         }
     }
 }

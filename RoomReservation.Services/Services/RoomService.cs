@@ -45,7 +45,7 @@ namespace RoomReservation.Application.Services
 
         public async Task <Result<RoomDto>> UpdateAsync(RoomDto updateRoom)
         {
-            var roomResult =  await _roomRepository.UpdateAsync(_mapper.Map<Room>(updateRoom));
+            var roomResult =  await _roomRepository.UpdateAsync(updateRoom);
             
             return  _mapper.Map<Result<RoomDto>>(roomResult);
         }

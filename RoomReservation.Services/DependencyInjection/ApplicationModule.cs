@@ -15,6 +15,8 @@ namespace RoomReservation.Infrastructure.DependencyInjection
         {
        
             services.AddScoped(typeof(IRoomService), typeof(RoomService));
+            services.AddScoped(typeof(IReservationService), typeof(ReservationService));
+            services.AddScoped(typeof(IUserService), typeof(UserService));
 
             return services;
         }

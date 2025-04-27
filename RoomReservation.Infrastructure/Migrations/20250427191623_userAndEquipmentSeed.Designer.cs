@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RoomReservation.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using RoomReservation.Infrastructure.Context;
 namespace RoomReservation.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250427191623_userAndEquipmentSeed")]
+    partial class userAndEquipmentSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,19 +196,19 @@ namespace RoomReservation.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Password = "IdioP+/nL+5jf8yWL3tVYWMa5g6sgNIs5w4JFQNXuEs=",
+                            Password = "tbmfBSR3dPEPMxiU08g3TQ1ebvxztI6VKZ3Cql5p3c4=",
                             Username = "jnowak"
                         },
                         new
                         {
                             Id = 2,
-                            Password = "Ix7MfReNpfIpg7xXlZk5bWwTmkV5h64e4AJtiEMtanI=",
+                            Password = "DXbA4LtE2GyS9KQgNTWgZ8uBfO9ovzAQW0sc2c7TYl0=",
                             Username = "kkowalski"
                         },
                         new
                         {
                             Id = 3,
-                            Password = "VOoS58R1AHocCK0wA764P3UC5yn2xjOL5ZfEggL9MAU=",
+                            Password = "HiJh9yCo9Yg9g6+nCh4Dc47Glm5RMKNDMaT07jY7Htc=",
                             Username = "unowakowski"
                         });
                 });

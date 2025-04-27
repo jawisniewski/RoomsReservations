@@ -15,7 +15,7 @@ namespace RoomReservation.Application.DTOs.Room.CreateRoom
         public required int TableCount { get; set; }
         public required RoomLayoutEnum RoomLayout { get; set; }
         public List<CreateRoomEquipmentRequest>? RoomsEquipments { get; set; }
-        public CreateRoomReservationLimitRequest? RoomReservationLimit { get; set; }
+        public RoomReservationLimitDto? RoomReservationLimit { get; set; }
 
     }
 }

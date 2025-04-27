@@ -8,7 +8,6 @@ namespace RoomReservation.Application.DTOs.Room
 {
     public class RoomReservationLimitDto
     {
-        public int Id { get; set; }
         public int MinTime { get; set; }
         public int MaxTime { get; set; }
     }

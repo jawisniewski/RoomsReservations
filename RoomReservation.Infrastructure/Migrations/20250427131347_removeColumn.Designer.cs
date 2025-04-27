@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RoomReservation.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using RoomReservation.Infrastructure.Context;
 namespace RoomReservation.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250427131347_removeColumn")]
+    partial class removeColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,28 +41,6 @@ namespace RoomReservation.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Equipments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Projektor"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Whiteboard"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Zestaw do wideokonferencji"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Ekran"
-                        });
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.Reservation", b =>
@@ -177,37 +158,17 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Password")
+                    b.Property<string>("Login")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Password = "IdioP+/nL+5jf8yWL3tVYWMa5g6sgNIs5w4JFQNXuEs=",
-                            Username = "jnowak"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Password = "Ix7MfReNpfIpg7xXlZk5bWwTmkV5h64e4AJtiEMtanI=",
-                            Username = "kkowalski"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Password = "VOoS58R1AHocCK0wA764P3UC5yn2xjOL5ZfEggL9MAU=",
-                            Username = "unowakowski"
-                        });
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.Reservation", b =>
