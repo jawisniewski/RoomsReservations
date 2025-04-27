@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RoomReservation.Core\RoomReservation.Shared.csproj" />
     <ProjectReference Include="..\RoomReservation.Domain\RoomReservation.Domain.csproj" />
   </ItemGroup>
 

@@ -2,6 +2,7 @@
 using RoomReservation.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,14 +22,16 @@ namespace RoomReservation.Infrastructure.Context
             modelBuilder.Entity<Room>(r =>
             {
                 r.HasKey(r => r.Id);
+                r.Property(e => e.Id)
+                    .ValueGeneratedOnAdd(); 
 
                 r.Property(r => r.Name)
                     .IsRequired()
                     .HasMaxLength(300);
 
                 r.HasMany(r => r.RoomsEquipments)
-                .WithOne(re => re.Room)
-                .HasForeignKey(re => re.RoomId);
+                    .WithOne(re => re.Room)
+                    .HasForeignKey(re => re.RoomId);
 
                 r.HasOne(r => r.RoomReservationLimit)
                     .WithOne(r => r.Room)
@@ -42,6 +45,8 @@ namespace RoomReservation.Infrastructure.Context
             modelBuilder.Entity<Equipment>(e =>
             {
                 e.HasKey(e => e.Id);
+                e.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 e.Property(e => e.Name)
                     .IsRequired()
@@ -55,10 +60,15 @@ namespace RoomReservation.Infrastructure.Context
             modelBuilder.Entity<Reservation>(r =>
             {
                 r.HasKey(r => r.Id);
+                r.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
                 r.Property(r => r.StartDate)
                     .IsRequired();
+
                 r.Property(r => r.EndDate)
                     .IsRequired();
+
                 r.HasOne(r => r.Room)
                     .WithMany(r => r.Reservations)
                     .HasForeignKey(r => r.RoomId);

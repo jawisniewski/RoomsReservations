@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Logging;
 using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.DTOs.Room.CreateRoom;
-using RoomReservation.Application.DTOs.Room.UpdateRoom;
 using RoomReservation.Application.Interfaces.Repositories;
 using RoomReservation.Application.Interfaces.Services;
 using RoomReservation.Domain.Entities;
+using RoomReservation.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,48 +27,41 @@ namespace RoomReservation.Application.Services
 
         }
 
-        public async Task<Room> CreateAsync(CreateRoomRequest room)
+        public async Task<Result<RoomDto>> CreateAsync(CreateRoomRequest room)
         {
-            var roomEntity = _mapper.Map<Domain.Entities.Room>(room);
+            var roomEntity = _mapper.Map<Room>(room);
             var createRoomResult = await _roomRepository.CreateAsync(roomEntity);
 
-            if (createRoomResult == null)
-            {
-                _logger.LogError($"Failed to create room {room.Name}");
 
-                return null;
-            }
-
-            _logger.LogInformation($"Room created successfully {room.Name}");
-
-            return createRoomResult;
+            return _mapper.Map<Result<RoomDto>>(createRoomResult);
         }
 
-        public async Task<bool> DeleteAsync(int roomId)
+        public async Task<Result<bool>> DeleteAsync(int roomId)
         {
-            var deleteRusult = await _roomRepository.DeleteAsync(roomId);
+            var deleteResult = await _roomRepository.DeleteAsync(roomId);
 
-            return deleteRusult;
+            return deleteResult;
         }
 
-        public async Task<RoomDto> GetByNameAsync(string name)
+        public async Task <Result<RoomDto>> UpdateAsync(RoomDto updateRoom)
         {
-            var room = await _roomRepository.GetByNameAsync(name);
-
-            return _mapper.Map<RoomDto>(room);
+            var roomResult =  await _roomRepository.UpdateAsync(_mapper.Map<Room>(updateRoom));
+            
+            return  _mapper.Map<Result<RoomDto>>(roomResult);
         }
-
-        public async Task<List<RoomDto>> GetListAsync()
+        public async Task<Result<RoomDto>> GetByNameAsync(string name)
         {
-            var rooms = await _roomRepository.GetListAsync();
-            return _mapper.Map<List<RoomDto>>(rooms);
+            var roomResult = await _roomRepository.GetByNameAsync(name);
+
+            return _mapper.Map<Result<RoomDto>>(roomResult);
         }
 
-        public async Task<RoomDto> UpdateAsync(UpdateRoomRequest updateRoom)
+        public async Task<Result<List<RoomDto>>> GetListAsync()
         {
-            var room =  await _roomRepository.UpdateAsync(_mapper.Map<Room>(updateRoom));
+            var roomsResult = await _roomRepository.GetListAsync();
 
-            return _mapper.Map<RoomDto>(room);
+            return _mapper.Map<Result<List<RoomDto>>>(roomsResult);
         }
+
     }
 }

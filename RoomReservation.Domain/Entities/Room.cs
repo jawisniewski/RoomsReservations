@@ -12,9 +12,10 @@ namespace RoomReservation.Domain.Entities
         public required int Id { get; set; }
         public required string Name { get; set; }
         public required int Capacity { get; set; }
+        public required int TableCount { get; set; }
         public required RoomLayoutEnum RoomLayout { get; set; }
-        public virtual List<Reservation>? Reservations { get; set; }
-        public virtual RoomReservationLimit? RoomReservationLimit { get; set; }
-        public virtual List<RoomsEquipments>? RoomsEquipments { get; set; }
+        public virtual List<Reservation> Reservations { get; set; } = [];
+        public virtual RoomReservationLimit? RoomReservationLimit { get; set; } 
+        public virtual List<RoomsEquipments> RoomsEquipments { get; set; } = [];
     }
 }

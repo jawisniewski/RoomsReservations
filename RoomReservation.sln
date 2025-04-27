@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomReservation.Domain", "R
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomReservation.Shared", "RoomReservation.Core\RoomReservation.Shared.csproj", "{FB524803-6B7F-4208-83FC-53E1AC9F216A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{A5B60BED-FEE3-459D-8877-9400C88507D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5B60BED-FEE3-459D-8877-9400C88507D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5B60BED-FEE3-459D-8877-9400C88507D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB524803-6B7F-4208-83FC-53E1AC9F216A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB524803-6B7F-4208-83FC-53E1AC9F216A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB524803-6B7F-4208-83FC-53E1AC9F216A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB524803-6B7F-4208-83FC-53E1AC9F216A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

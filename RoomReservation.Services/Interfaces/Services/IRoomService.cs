@@ -1,7 +1,7 @@
 ﻿using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.DTOs.Room.CreateRoom;
-using RoomReservation.Application.DTOs.Room.UpdateRoom;
 using RoomReservation.Domain.Entities;
+using RoomReservation.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +12,10 @@ namespace RoomReservation.Application.Interfaces.Services
 {
     public interface IRoomService
     {
-        Task<Room> CreateAsync(CreateRoomRequest room);
-        Task<RoomDto> UpdateAsync(UpdateRoomRequest room);
-        Task<bool> DeleteAsync(int roomId);
-        Task<RoomDto> GetByNameAsync(string name);
-        Task<List<RoomDto>> GetListAsync();
+        Task<Result<RoomDto>> CreateAsync(CreateRoomRequest room);
+        Task<Result<RoomDto>> UpdateAsync(RoomDto room);
+        Task<Result<bool>> DeleteAsync(int roomId);
+        Task<Result<RoomDto>> GetByNameAsync(string name);
+        Task<Result<List<RoomDto>>> GetListAsync();
     }
 }

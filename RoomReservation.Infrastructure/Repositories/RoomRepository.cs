@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using RoomReservation.Application.Interfaces.Repositories;
 using RoomReservation.Domain.Entities;
 using RoomReservation.Infrastructure.Context;
+using RoomReservation.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace RoomReservation.Infrastructure.Repositories
 
         }
 
-        public async Task<Room> CreateAsync(Room room)
+        public async Task<Result<Room>> CreateAsync(Room room)
         {
             await _dbSet.AddAsync(room);
 
@@ -34,21 +35,22 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 _logger.LogError("Failed to create room");
 
-                return null;
+                return Result<Room>.Failure("Failed to create room");
             }
 
-            return room;
+            return Result<Room>.Success(room);
         }
 
-        public async Task<bool> DeleteAsync(int roomId)
+        public async Task<Result<bool>> DeleteAsync(int roomId)
         {
             var room = await _dbSet.FirstOrDefaultAsync(r => r.Id == roomId);
 
-            if(room == null)
+            if (room == null)
             {
                 _logger.LogError($"Room not found ${roomId}");
 
-                return false;
+
+                return Result<bool>.Failure($"Room not found ${roomId}");
             }
 
             _dbSet.Remove(room);
@@ -59,45 +61,65 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 _logger.LogError($"Failed to delete room ${roomId}");
 
-                return false;
+                return Result<bool>.Failure($"Failed to delete room ${roomId}");
             }
-            return true;
+
+            return Result<bool>.Success();
         }
 
-        public async Task<Room> GetByNameAsync(string name)
+        public async Task<Result<Room>> GetByNameAsync(string name)
         {
-            var room = await _dbSet.Where(x => x.Name == name)
+            var room = await _dbSet.Where(x => x.Name.ToLower() == name.ToLower())
                  .Include(ri => ri.RoomsEquipments)
                      .ThenInclude(i => i.Equipment)
                  .Include(x => x.RoomReservationLimit)
              .FirstOrDefaultAsync();
 
-            return room;
+            if (room == null)
+            {
+                _logger.LogError($"Room not found {name}");
+                return Result<Room>.Failure($"Room not found {name}");
+            }
+
+            return Result<Room>.Success(room);
         }
 
-        public Task<List<Room>> GetListAsync()
+        public async Task<Result<List<Room>>> GetListAsync()
         {
-            var rooms = _dbSet
+            var rooms = await _dbSet
                 .Include(ri => ri.RoomsEquipments)
                     .ThenInclude(i => i.Equipment)
                 .Include(x => x.RoomReservationLimit)
                 .ToListAsync();
 
-            return rooms;
+            if (rooms == null)
+            {
+                _logger.LogError("Failed to get rooms");
+                return Result<List<Room>>.Failure("Failed to get rooms");
+            }
+
+            if (rooms.Count == 0)
+            {
+                _logger.LogError("No rooms found");
+                return Result<List<Room>>.Failure("No rooms found");
+            }
+
+            return Result<List<Room>>.Success(rooms);
         }
 
-        public async Task<Room> UpdateAsync(Room room)
+        public async Task<Result<Room>> UpdateAsync(Room room)
         {
             _dbSet.Update(room);
+
             var result = await _context.SaveChangesAsync();
 
             if (result == 0)
             {
                 _logger.LogError("Failed to update room");
-                return null;
+                return Result<Room>.Failure("Failed to update room");
             }
 
-            return room;
+            return Result<Room>.Success(room);
         }
     }
 }

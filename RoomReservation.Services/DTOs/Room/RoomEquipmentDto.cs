@@ -1,5 +1,4 @@
-﻿using RoomReservation.Domain.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +8,8 @@ namespace RoomReservation.Application.DTOs.Room
 {
     public class RoomEquipmentDto
     {
-        public required int Id { get; set; }
+        public required int Id { get; set; }    
         public required int EquipmentId { get; set; }
-        public Equipment? Equipment { get; set; }
         public int Quantity { get; set; }
     }
 }

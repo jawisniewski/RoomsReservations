@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Room
 {
-    public class RoomEquipmentRequest
+    public class RoomReservationLimitDto
     {
-        public required int Id { get; set; }    
-        public required int EquipmentId { get; set; }
-        public int Quantity { get; set; }
+        public int Id { get; set; }
+        public int MinTime { get; set; }
+        public int MaxTime { get; set; }
     }
 }
