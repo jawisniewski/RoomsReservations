@@ -76,4 +76,14 @@ public class RoomsController : ControllerBase
 
         return Ok(getByListResult);
     }
+    [HttpGet("GetAvalibityRooms")]
+    public async Task<ActionResult<List<CreateRoomRequest>>> GetAvalibityRooms([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var getByListResult = await _roomService.GetAvalibilityRoomAsync(startDate, endDate);
+
+        if (!getByListResult.IsSuccess)
+            return UnprocessableEntity(getByListResult);
+
+        return Ok(getByListResult);
+    }
 }

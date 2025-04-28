@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using RoomReservation.Application.DTOs.Reservation;
 using RoomReservation.Application.DTOs.Reservation.CreateReservation;
 using RoomReservation.Application.DTOs.Reservation.UpdateReservation;
@@ -17,16 +18,34 @@ namespace RoomReservation.Application.Services
     {
         private readonly IMapper _mapper;
         private readonly IReservationRepository _reservationRepository;
-        public ReservationService(IMapper mapper, IReservationRepository reservationRepository)
+        private readonly IRoomRepository _roomRepository;
+        private readonly ILogger<ReservationService> _logger;
+        public ReservationService(IMapper mapper, IReservationRepository reservationRepository, IRoomRepository roomRepository, ILogger<ReservationService> logger)
         {
             _mapper = mapper;
             _reservationRepository = reservationRepository;
+            _roomRepository = roomRepository;
+            _logger = logger;
         }
         public async Task<Result<ReservationDto>> CreateAsync(CreateReservationRequest reservationRequest, int userId)
         {
             var reservation = _mapper.Map<Domain.Entities.Reservation>(reservationRequest);
             reservation.UserId = userId;
+            var checkRoom = await _roomRepository.IsRoomAvailableAsync(reservationRequest.RoomId, reservationRequest.StartDate, reservationRequest.EndDate);
+
+            if (!checkRoom.IsSuccess)
+            {
+                return _mapper.Map<Result<ReservationDto>>(checkRoom);
+            }
+
+            if (await _reservationRepository.UserHasReservation(userId, reservationRequest.StartDate, reservationRequest.EndDate))
+            {
+                _logger.LogWarning($"User has already a reservation {userId} {reservationRequest.StartDate}/{reservationRequest.EndDate}");
+                return Result<ReservationDto>.Failure("User has already a reservation", System.Net.HttpStatusCode.BadRequest);
+            }
+
             var result = await _reservationRepository.CreateAsync(reservation);
+
             return _mapper.Map<Result<ReservationDto>>(result);
         }
 
@@ -44,7 +63,21 @@ namespace RoomReservation.Application.Services
 
         public async Task<Result<ReservationDto>> UpdateAsync(UpdateReservationRequest updateReservationRequest, int userId)
         {
+            var checkRoom = await _roomRepository.IsRoomAvailableAsync(updateReservationRequest.RoomId, updateReservationRequest.StartDate, updateReservationRequest.EndDate);
+
+            if (!checkRoom.IsSuccess)
+            {
+                return _mapper.Map<Result<ReservationDto>>(checkRoom);
+            }
+
+            if (!await _reservationRepository.UserHasReservation(userId, updateReservationRequest.StartDate, updateReservationRequest.EndDate))
+            {
+                _logger.LogWarning($"User has already a reservation {userId} {updateReservationRequest.StartDate}/{updateReservationRequest.EndDate}");
+                return Result<ReservationDto>.Failure("User has already a reservation", System.Net.HttpStatusCode.BadRequest);
+            }
+
             var result = await _reservationRepository.UpdateAsync(updateReservationRequest, userId);
+
             return _mapper.Map<Result<ReservationDto>>(result);
         }
     }

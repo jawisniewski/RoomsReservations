@@ -17,6 +17,7 @@ namespace RoomReservation.Application.Interfaces.Repositories
         Task<Result<Reservation>> UpdateAsync(UpdateReservationRequest reservation, int userId);
         Task<Result<bool>> DeleteAsync(int reservationId, int userId);
         Task<Result<List<Reservation>>> GetListAsync();
+        Task<bool> UserHasReservation(int userId, DateTime startTime, DateTime endTime);
 
     }
 }

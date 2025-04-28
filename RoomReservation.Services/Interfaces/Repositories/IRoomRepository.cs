@@ -17,5 +17,7 @@ namespace RoomReservation.Application.Interfaces.Repositories
         Task<Result<bool>> DeleteAsync(int roomId);
         Task<Result<Room>> GetByNameAsync(string name);
         Task<Result<List<Room>>> GetListAsync();
+        Task<Result<List<Room>>> GetAvalibilityRoomAsync(DateTime startDate, DateTime endDate);
+        Task<Result<bool>> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate);
     }
 }

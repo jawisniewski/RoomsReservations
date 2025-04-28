@@ -55,7 +55,7 @@ namespace RoomReservation.Infrastructure.Repositories
             }
 
             if (!CheckUserAuthorization(reservation, userId))
-            {   
+            {
                 _logger.LogError($"User {userId} is not authorized to update reservation {reservation.Id}");
 
                 return Result<bool>.Failure($"User {userId} is not authorized to update reservation {reservation.Id}", System.Net.HttpStatusCode.Unauthorized);
@@ -135,6 +135,16 @@ namespace RoomReservation.Infrastructure.Repositories
                 return false;
 
             return true;
+        }
+
+        public async Task<bool> UserHasReservation(int userId, DateTime startTime, DateTime endTime)
+        {
+            return await _dbSet
+                  .AnyAsync(r =>
+                      r.UserId == userId
+                      && r.StartDate < endTime
+                      && r.EndDate > startTime);
+
         }
     }
 }

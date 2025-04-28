@@ -43,11 +43,11 @@ namespace RoomReservation.Application.Services
             return deleteResult;
         }
 
-        public async Task <Result<RoomDto>> UpdateAsync(RoomDto updateRoom)
+        public async Task<Result<RoomDto>> UpdateAsync(RoomDto updateRoom)
         {
-            var roomResult =  await _roomRepository.UpdateAsync(updateRoom);
-            
-            return  _mapper.Map<Result<RoomDto>>(roomResult);
+            var roomResult = await _roomRepository.UpdateAsync(updateRoom);
+
+            return _mapper.Map<Result<RoomDto>>(roomResult);
         }
         public async Task<Result<RoomDto>> GetByNameAsync(string name)
         {
@@ -62,6 +62,12 @@ namespace RoomReservation.Application.Services
 
             return _mapper.Map<Result<List<RoomDto>>>(roomsResult);
         }
+        public async Task<Result<List<RoomDto>>> GetAvalibilityRoomAsync(DateTime startDate, DateTime endDate)
+        {
+            var roomsResult = await _roomRepository.GetAvalibilityRoomAsync(startDate, endDate);
 
+            return _mapper.Map<Result<List<RoomDto>>>(roomsResult);
+
+        }
     }
 }

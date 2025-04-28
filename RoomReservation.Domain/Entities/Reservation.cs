@@ -14,7 +14,7 @@ namespace RoomReservation.Domain.Entities
         public required DateTime EndDate { get; set; }
         public required int RoomId { get; set; }
         public required int UserId { get; set; }
-        public Room? Room { get; set; }
-        public User? User { get; set; }
+        public virtual Room? Room { get; set; }
+        public virtual User? User { get; set; }
     }
 }

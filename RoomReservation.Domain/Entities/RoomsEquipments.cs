@@ -10,8 +10,8 @@ namespace RoomReservation.Domain.Entities
     {
         public required int Id { get; set; }
         public int Quantity { get; set; }
-        public Equipment? Equipment { get; set; }
-        public Room? Room { get; set; }
+        public virtual Equipment? Equipment { get; set; }
+        public virtual Room? Room { get; set; }
         public required int EquipmentId { get; set; }
         public required int RoomId { get; set; }
 

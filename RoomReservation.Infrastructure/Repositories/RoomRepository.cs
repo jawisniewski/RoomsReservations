@@ -8,6 +8,7 @@ using RoomReservation.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -161,6 +162,73 @@ namespace RoomReservation.Infrastructure.Repositories
                     MaxTime = room.RoomReservationLimit.MaxTime
                 };
             }
+        }
+
+        public async Task<Result<List<Room>>> GetAvalibilityRoomAsync(DateTime startDate, DateTime endDate)
+        {
+            var rooms = await _dbSet
+                .Where(r =>
+                    !r.Reservations.Any(re => re.StartDate < endDate && re.EndDate > startDate))
+                .Include(r => r.RoomsEquipments)
+                    .ThenInclude(r => r.Equipment)
+                .Include(rrl => rrl.RoomReservationLimit)
+                .ToListAsync();
+
+            if (rooms == null)
+            {
+                _logger.LogError("Failed to get rooms");
+                return Result<List<Room>>.Failure("Failed to get rooms", System.Net.HttpStatusCode.UnprocessableEntity);
+            }
+
+            if (rooms.Count == 0)
+            {
+                _logger.LogError("No rooms found");
+                return Result<List<Room>>.Failure("No rooms found", System.Net.HttpStatusCode.NotFound);
+            }
+
+            return Result<List<Room>>.Success(rooms);
+        }
+
+        public async Task<Result<bool>> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate)
+        {
+            var room = await _dbSet
+                .Include(r => r.Reservations)
+                .Include(r => r.RoomReservationLimit)
+                .FirstOrDefaultAsync(r => r.Id == roomId);
+
+            if (room == null)
+                return LogAndReturnFailure($"Room not found {roomId}", HttpStatusCode.NotFound);
+
+            if (room.Reservations == null || !room.Reservations.Any())
+                return Result<bool>.Success();
+
+            if (IsOverlappingReservation(room.Reservations, startDate, endDate))
+                return LogAndReturnFailure($"Room reserved {roomId}", HttpStatusCode.Conflict);
+
+            if (!IsReservationDurationValid(room.RoomReservationLimit, startDate, endDate))
+                return LogAndReturnFailure($"Room reservation duration is not valid {roomId}", HttpStatusCode.BadRequest);
+
+            return Result<bool>.Success();
+        }
+
+        private bool IsOverlappingReservation(IEnumerable<Reservation> reservations, DateTime startDate, DateTime endDate)
+        {
+            return reservations.Any(r => r.StartDate < endDate && r.EndDate > startDate);
+        }
+
+        private bool IsReservationDurationValid(RoomReservationLimit limit, DateTime startDate, DateTime endDate)
+        {
+            if (limit == null)
+                return true;
+
+            var durationMinutes = (endDate - startDate).TotalMinutes;
+            return durationMinutes >= limit.MinTime && durationMinutes <= limit.MaxTime;
+        }
+
+        private Result<bool> LogAndReturnFailure(string message, HttpStatusCode statusCode)
+        {
+            _logger.LogWarning(message);
+            return Result<bool>.Failure(message, statusCode);
         }
     }
 }
