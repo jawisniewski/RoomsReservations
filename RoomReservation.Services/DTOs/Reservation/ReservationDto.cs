@@ -8,12 +8,9 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Reservation
 {
-    public class ReservationDto
+    public class ReservationDto : BaseReservationDto
     {
         public required int Id { get; set; }
-        public required DateTime StartDate { get; set; }
-        public required DateTime EndDate { get; set; }
-        public required int RoomId { get; set; }
         public required int UserId { get; set; }
         public RoomDto? Room { get; set; }
         public User? User { get; set; }

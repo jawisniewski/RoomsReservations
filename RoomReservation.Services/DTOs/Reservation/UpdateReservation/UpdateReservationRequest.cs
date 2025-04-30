@@ -8,11 +8,8 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Reservation.UpdateReservation
 {
-    public class UpdateReservationRequest
+    public class UpdateReservationRequest: BaseReservationDto
     {
         public required int Id { get; set; }
-        public required DateTime StartDate { get; set; }
-        public required DateTime EndDate { get; set; }
-        public required int RoomId { get; set; }
     }
 }
