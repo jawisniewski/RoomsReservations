@@ -1,13 +1,26 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.OpenApi.Models;
 using RoomReservation.API.Auth;
+using RoomReservation.API.Validators;
+using RoomReservation.API.Validators.RoomValidators.RoomReservationLimitsValidator;
+using RoomReservation.Application.DTOs.Room;
+using RoomReservation.Application.DTOs.Room.CreateRoom;
 using RoomReservation.Infrastructure.DependencyInjection;
 using RoomReservation.Shared.DependencyInjection;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+
 builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -50,7 +63,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddInfrastructure(connectionString);
 builder.Services.AddApplication();
 builder.Services.AddShared();
-
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddValidatorsFromAssemblyContaining<RoomReservationLimitsValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

@@ -10,8 +10,8 @@ namespace RoomReservation.Domain.Entities
     {
         public required int Id { get; set; }
         public required int RoomId { get; set; }
-        public int MinTime{ get; set; }
-        public int MaxTime{ get; set; }
+        public int? MinTime{ get; set; }
+        public int? MaxTime{ get; set; }
         public virtual Room? Room { get; set; }
     }
 }

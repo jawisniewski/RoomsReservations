@@ -14,7 +14,7 @@ namespace RoomReservation.Application.Interfaces.Services
 {
     public interface IReservationService
     {
-        Task<Result<ReservationDto>> CreateAsync(CreateReservationRequest room, int userId);
+        Task<Result> CreateAsync(CreateReservationRequest room, int userId);
         Task<Result<ReservationDto>> UpdateAsync(UpdateReservationRequest room, int userId);
         Task<Result<bool>> DeleteAsync(int roomId, int userId);
         Task<Result<List<ReservationDto>>> GetListAsync();

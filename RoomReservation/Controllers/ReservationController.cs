@@ -30,6 +30,10 @@ namespace RoomReservation.API.Controllers
         [HttpPost("Create")]
         public async Task<ActionResult> Create([FromBody] CreateReservationRequest createReservationRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             int.TryParse(userIdClaim, out var userId);
 
@@ -42,9 +46,13 @@ namespace RoomReservation.API.Controllers
 
         }
 
-        [HttpPut("Update")]
+        [HttpPatch("Update")]
         public async Task<ActionResult> Update([FromBody] UpdateReservationRequest updateReservationRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var roomResult = await _reservationService.UpdateAsync(updateReservationRequest, User.GetUserId());
 
             if (!roomResult.IsSuccess)

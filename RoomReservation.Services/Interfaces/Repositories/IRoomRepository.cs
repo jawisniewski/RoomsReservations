@@ -14,10 +14,10 @@ namespace RoomReservation.Application.Interfaces.Repositories
     {
         Task<Result<Room>> CreateAsync(Room room);
         Task<Result<Room>> UpdateAsync(RoomDto room);
-        Task<Result<bool>> DeleteAsync(int roomId);
+        Task<Result> DeleteAsync(int roomId);
         Task<Result<Room>> GetByNameAsync(string name);
-        Task<Result<List<Room>>> GetListAsync();
-        Task<Result<List<Room>>> GetAvalibilityRoomAsync(DateTime startDate, DateTime endDate);
-        Task<Result<bool>> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate);
+        Task<Result<List<Room>>> GetListAsync(RoomFilter roomFilter);
+        Task<Result<List<Room>>> GetAvalibilityRoomAsync(RoomAvalibilityRequest roomAvalibilityRequest);
+        Task<Result> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate);
     }
 }

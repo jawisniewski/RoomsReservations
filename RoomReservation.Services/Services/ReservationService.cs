@@ -27,7 +27,7 @@ namespace RoomReservation.Application.Services
             _roomRepository = roomRepository;
             _logger = logger;
         }
-        public async Task<Result<ReservationDto>> CreateAsync(CreateReservationRequest reservationRequest, int userId)
+        public async Task<Result> CreateAsync(CreateReservationRequest reservationRequest, int userId)
         {
             var reservation = _mapper.Map<Domain.Entities.Reservation>(reservationRequest);
             reservation.UserId = userId;
@@ -35,7 +35,7 @@ namespace RoomReservation.Application.Services
 
             if (!checkRoom.IsSuccess)
             {
-                return _mapper.Map<Result<ReservationDto>>(checkRoom);
+                return _mapper.Map<Result>(checkRoom);
             }
 
             if (await _reservationRepository.UserHasReservation(userId, reservationRequest.StartDate, reservationRequest.EndDate))

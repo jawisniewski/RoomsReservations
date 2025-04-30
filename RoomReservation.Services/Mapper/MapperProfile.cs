@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RoomReservation.Application.DTOs.Equipment;
 using RoomReservation.Application.DTOs.Reservation;
 using RoomReservation.Application.DTOs.Reservation.CreateReservation;
 using RoomReservation.Application.DTOs.Reservation.UpdateReservation;
@@ -18,12 +19,11 @@ namespace RoomReservation.Application.Mapper
     {
         public MapperProfile()
         {
-            CreateMap<CreateRoomRequest, Room>().ReverseMap();
-            CreateMap<CreateRoomEquipmentRequest, Equipment>().ReverseMap();
+            CreateMap<CreateRoomRequest, Room>().ReverseMap();           
             CreateMap<RoomReservationLimitDto, RoomReservationLimit>().ReverseMap();
             CreateMap<RoomDto, Room>().ReverseMap();
-            CreateMap<RoomEquipmentDto, Equipment>().ReverseMap();
-            CreateMap<RoomReservationLimitDto, RoomReservationLimit>().ReverseMap();
+            CreateMap<RoomEquipmentDto, RoomsEquipments>()
+                .ForMember(dest => dest.EquipmentId, opt => opt.MapFrom(src => src.EquipmentType)).ReverseMap();
             CreateMap<RoomDto, Room>().ReverseMap();
             CreateMap<Result<RoomDto>, Result<Room>>().ReverseMap();
             CreateMap<Result<List<RoomDto>>, Result<List<Room>>>().ReverseMap();

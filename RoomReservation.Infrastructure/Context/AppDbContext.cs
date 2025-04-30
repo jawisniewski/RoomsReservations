@@ -57,7 +57,7 @@ namespace RoomReservation.Infrastructure.Context
                     .HasForeignKey(re => re.EquipmentId);
                 e.HasData(
                     new Equipment { Id = 1, Name = "Projektor" },
-                    new Equipment { Id = 2, Name = "Whiteboard" },
+                    new Equipment { Id = 2, Name = "Tablica" },
                     new Equipment { Id = 3, Name = "Zestaw do wideokonferencji" },
                     new Equipment { Id = 4, Name = "Ekran" });
             });
@@ -77,6 +77,10 @@ namespace RoomReservation.Infrastructure.Context
                 r.HasOne(r => r.Room)
                     .WithMany(r => r.Reservations)
                     .HasForeignKey(r => r.RoomId);
+
+                r.HasOne(r => r.User)
+                    .WithMany(u => u.Reservations)
+                    .HasForeignKey(r => r.UserId);
             });
 
             modelBuilder.Entity<User>(u =>

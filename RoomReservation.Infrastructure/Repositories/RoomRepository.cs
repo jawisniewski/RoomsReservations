@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.Interfaces.Repositories;
@@ -43,7 +44,7 @@ namespace RoomReservation.Infrastructure.Repositories
             return Result<Room>.Success(room);
         }
 
-        public async Task<Result<bool>> DeleteAsync(int roomId)
+        public async Task<Result> DeleteAsync(int roomId)
         {
             var room = await _dbSet.FirstOrDefaultAsync(r => r.Id == roomId);
 
@@ -52,7 +53,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 _logger.LogError($"Room not found ${roomId}");
 
 
-                return Result<bool>.Failure($"Room not found ${roomId}", System.Net.HttpStatusCode.NotFound);
+                return Result.Failure($"Room not found ${roomId}", System.Net.HttpStatusCode.NotFound);
             }
 
             _dbSet.Remove(room);
@@ -63,10 +64,10 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 _logger.LogError($"Failed to delete room ${roomId}");
 
-                return Result<bool>.Failure($"Failed to delete room ${roomId}", System.Net.HttpStatusCode.UnprocessableEntity);
+                return Result.Failure($"Failed to delete room ${roomId}", System.Net.HttpStatusCode.UnprocessableEntity);
             }
 
-            return Result<bool>.Success();
+            return Result.Success();
         }
 
         public async Task<Result<Room>> GetByNameAsync(string name)
@@ -86,13 +87,16 @@ namespace RoomReservation.Infrastructure.Repositories
             return Result<Room>.Success(room);
         }
 
-        public async Task<Result<List<Room>>> GetListAsync()
+        public async Task<Result<List<Room>>> GetListAsync(RoomFilter roomFilter)
         {
-            var rooms = await _dbSet
+            var roomsQuery = _dbSet
                 .Include(ri => ri.RoomsEquipments)
                     .ThenInclude(i => i.Equipment)
-                .Include(x => x.RoomReservationLimit)
-                .ToListAsync();
+                .Include(x => x.RoomReservationLimit).AsQueryable();
+
+            ApplyFilters(roomFilter, ref roomsQuery);
+
+            var rooms = await roomsQuery.ToListAsync();
 
             if (rooms == null)
             {
@@ -164,15 +168,18 @@ namespace RoomReservation.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result<List<Room>>> GetAvalibilityRoomAsync(DateTime startDate, DateTime endDate)
+        public async Task<Result<List<Room>>> GetAvalibilityRoomAsync(RoomAvalibilityRequest roomAvalibilityRequest)
         {
-            var rooms = await _dbSet
+            var roomsQuery = _dbSet
                 .Where(r =>
-                    !r.Reservations.Any(re => re.StartDate < endDate && re.EndDate > startDate))
+                    !r.Reservations.Any(re => re.StartDate < roomAvalibilityRequest.AvailableTo && re.EndDate > roomAvalibilityRequest.AvailableFrom))
                 .Include(r => r.RoomsEquipments)
                     .ThenInclude(r => r.Equipment)
-                .Include(rrl => rrl.RoomReservationLimit)
-                .ToListAsync();
+                .Include(rrl => rrl.RoomReservationLimit).AsQueryable();
+
+            ApplyFilters(roomAvalibilityRequest, ref roomsQuery);
+
+            var rooms = await roomsQuery.ToListAsync();
 
             if (rooms == null)
             {
@@ -189,7 +196,19 @@ namespace RoomReservation.Infrastructure.Repositories
             return Result<List<Room>>.Success(rooms);
         }
 
-        public async Task<Result<bool>> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate)
+        private void ApplyFilters(RoomFilter roomAvalibilityRequest, ref IQueryable<Room> roomsQuery)
+        {
+            if (roomAvalibilityRequest.Capacity != null)
+                roomsQuery = roomsQuery.Where(r => r.Capacity >= roomAvalibilityRequest.Capacity);
+            if (roomAvalibilityRequest.TableCount != null)
+                roomsQuery = roomsQuery.Where(r => r.TableCount >= roomAvalibilityRequest.TableCount);
+            if (roomAvalibilityRequest.RoomLayout != null)
+                roomsQuery = roomsQuery.Where(r => r.RoomLayout == roomAvalibilityRequest.RoomLayout);
+            if (roomAvalibilityRequest.EquipmentIds != null && roomAvalibilityRequest.EquipmentIds.Length > 0)
+                roomsQuery = roomsQuery.Where(r => r.RoomsEquipments.Any(re => roomAvalibilityRequest.EquipmentIds.Contains(re.EquipmentId)));
+        }
+
+        public async Task<Result> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate)
         {
             var room = await _dbSet
                 .Include(r => r.Reservations)
@@ -203,10 +222,10 @@ namespace RoomReservation.Infrastructure.Repositories
                 return Result<bool>.Success();
 
             if (IsOverlappingReservation(room.Reservations, startDate, endDate))
-                return LogAndReturnFailure($"Room reserved {roomId}", HttpStatusCode.Conflict);
+                return LogAndReturnFailure($"Room {room.Name}  reserved ", HttpStatusCode.Conflict);
 
-            if (!IsReservationDurationValid(room.RoomReservationLimit, startDate, endDate))
-                return LogAndReturnFailure($"Room reservation duration is not valid {roomId}", HttpStatusCode.BadRequest);
+            if (!IsReservationWithinLimits(room.RoomReservationLimit, startDate, endDate))
+                return LogAndReturnFailure($"Room {room.Name} reservation is not in limits", HttpStatusCode.BadRequest);
 
             return Result<bool>.Success();
         }
@@ -216,7 +235,7 @@ namespace RoomReservation.Infrastructure.Repositories
             return reservations.Any(r => r.StartDate < endDate && r.EndDate > startDate);
         }
 
-        private bool IsReservationDurationValid(RoomReservationLimit limit, DateTime startDate, DateTime endDate)
+        private bool IsReservationWithinLimits(RoomReservationLimit limit, DateTime startDate, DateTime endDate)
         {
             if (limit == null)
                 return true;
@@ -225,10 +244,10 @@ namespace RoomReservation.Infrastructure.Repositories
             return durationMinutes >= limit.MinTime && durationMinutes <= limit.MaxTime;
         }
 
-        private Result<bool> LogAndReturnFailure(string message, HttpStatusCode statusCode)
+        private Result LogAndReturnFailure(string message, HttpStatusCode statusCode)
         {
             _logger.LogWarning(message);
-            return Result<bool>.Failure(message, statusCode);
+            return Result.Failure(message, statusCode);
         }
     }
 }

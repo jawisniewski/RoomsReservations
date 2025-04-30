@@ -11,5 +11,6 @@ namespace RoomReservation.Domain.Entities
         public required int Id { get; set; } 
         public required string Username { get; set; }
         public required string Password { get; set; }
+        public List<Reservation>? Reservations { get; set; } = new List<Reservation>();
     }
 }
