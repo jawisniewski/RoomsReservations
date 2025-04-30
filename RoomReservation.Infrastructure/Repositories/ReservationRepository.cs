@@ -42,7 +42,7 @@ namespace RoomReservation.Infrastructure.Repositories
             return Result<Reservation>.Success(reservation);
         }
 
-        public async Task<Result<bool>> DeleteAsync(int reservationId, int userId)
+        public async Task<Result> DeleteAsync(int reservationId, int userId)
         {
 
             var reservation = await _dbSet.FirstOrDefaultAsync(r => r.Id == reservationId);
@@ -51,14 +51,14 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 _logger.LogWarning($"Reservation not found ${reservationId}");
 
-                return Result<bool>.Failure($"Reservation not found ${reservationId}", System.Net.HttpStatusCode.UnprocessableEntity);
+                return Result.Failure($"Reservation not found ${reservationId}", System.Net.HttpStatusCode.UnprocessableEntity);
             }
 
             if (!CheckUserAuthorization(reservation, userId))
             {
                 _logger.LogError($"User {userId} is not authorized to update reservation {reservation.Id}");
 
-                return Result<bool>.Failure($"User {userId} is not authorized to update reservation {reservation.Id}", System.Net.HttpStatusCode.Unauthorized);
+                return Result.Failure($"User {userId} is not authorized to update reservation {reservation.Id}", System.Net.HttpStatusCode.Unauthorized);
             }
 
             _dbSet.Remove(reservation);
@@ -69,10 +69,10 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 _logger.LogError($"Failed to delete reservation ${reservationId}");
 
-                return Result<bool>.Failure($"Failed to delete reservation ${reservationId}", System.Net.HttpStatusCode.UnprocessableEntity);
+                return Result.Failure($"Failed to delete reservation ${reservationId}", System.Net.HttpStatusCode.UnprocessableEntity);
             }
 
-            return Result<bool>.Success();
+            return Result.Success();
         }
 
         public async Task<Result<List<Reservation>>> GetListAsync()
@@ -137,13 +137,14 @@ namespace RoomReservation.Infrastructure.Repositories
             return true;
         }
 
-        public async Task<bool> UserHasReservation(int userId, DateTime startTime, DateTime endTime)
+        public async Task<bool> UserHasReservationAsync(int userId, DateTime startTime, DateTime endTime, int? reservationId)
         {
             return await _dbSet
                   .AnyAsync(r =>
                       r.UserId == userId
                       && r.StartDate < endTime
-                      && r.EndDate > startTime);
+                      && r.EndDate > startTime 
+                      && reservationId != r.Id);
 
         }
     }

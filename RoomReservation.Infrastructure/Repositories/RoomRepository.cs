@@ -219,7 +219,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 return LogAndReturnFailure($"Room not found {roomId}", HttpStatusCode.NotFound);
 
             if (room.Reservations == null || !room.Reservations.Any())
-                return Result<bool>.Success();
+                return Result.Success();
 
             if (IsOverlappingReservation(room.Reservations, startDate, endDate))
                 return LogAndReturnFailure($"Room {room.Name}  reserved ", HttpStatusCode.Conflict);
@@ -227,7 +227,7 @@ namespace RoomReservation.Infrastructure.Repositories
             if (!IsReservationWithinLimits(room.RoomReservationLimit, startDate, endDate))
                 return LogAndReturnFailure($"Room {room.Name} reservation is not in limits", HttpStatusCode.BadRequest);
 
-            return Result<bool>.Success();
+            return Result.Success();
         }
 
         private bool IsOverlappingReservation(IEnumerable<Reservation> reservations, DateTime startDate, DateTime endDate)

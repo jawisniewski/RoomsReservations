@@ -30,10 +30,6 @@ namespace RoomReservation.API.Controllers
         [HttpPost("Create")]
         public async Task<ActionResult> Create([FromBody] CreateReservationRequest createReservationRequest)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             int.TryParse(userIdClaim, out var userId);
 
@@ -43,16 +39,11 @@ namespace RoomReservation.API.Controllers
                 return UnprocessableEntity(reservationResult);
 
             return Ok(reservationResult);
-
         }
 
         [HttpPatch("Update")]
         public async Task<ActionResult> Update([FromBody] UpdateReservationRequest updateReservationRequest)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             var roomResult = await _reservationService.UpdateAsync(updateReservationRequest, User.GetUserId());
 
             if (!roomResult.IsSuccess)
@@ -65,15 +56,12 @@ namespace RoomReservation.API.Controllers
         [HttpDelete("Delete")]
         public async Task<ActionResult> Delete(int roomId)
         {
-
-
             var deleteResult = await _reservationService.DeleteAsync(roomId, User.GetUserId());
 
             if (!deleteResult.IsSuccess)
                 return UnprocessableEntity(deleteResult);
 
             return Ok();
-
         }
 
         [HttpGet("GetList")]

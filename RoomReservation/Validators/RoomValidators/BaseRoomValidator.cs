@@ -13,13 +13,9 @@ namespace RoomReservation.API.Validators.Room
         public BaseRoomValidator()
         {
             checkName();
-
             CheckTableCount();
-
             CheckRoomLayout();
-
             CheckEquipments();
-
             checkRoomLimits();
         }
 
