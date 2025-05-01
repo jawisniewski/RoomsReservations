@@ -1,8 +1,11 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RoomReservation.API.Validators;
 using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.DTOs.Room.CreateRoom;
 using RoomReservation.Application.Interfaces.Services;
+using System;
 
 namespace RoomReservation.Controllers;
 
@@ -31,7 +34,7 @@ public class RoomsController : ControllerBase
 
     }
 
-    [HttpPut("Update")]
+    [HttpPatch("Update")]
     public async Task<ActionResult> Update([FromBody] RoomDto updateRoom)
     {
         var roomResult = await _roomService.UpdateAsync(updateRoom);
@@ -55,21 +58,26 @@ public class RoomsController : ControllerBase
 
     }
 
-    [HttpGet("GetByName")]
-    public async Task<ActionResult<CreateRoomRequest>> GetByName(string name)
+    [HttpGet("GetList")]
+    public async Task<ActionResult<List<CreateRoomRequest>>> GetList([FromQuery] RoomFilter roomFilters)
     {
-        var getByNameResult = await _roomService.GetByNameAsync(name);
+        var getByListResult = await _roomService.GetListAsync(roomFilters);        
 
-        if (!getByNameResult.IsSuccess)
-            return UnprocessableEntity(getByNameResult);
+        if (!getByListResult.IsSuccess)
+            return UnprocessableEntity(getByListResult);
 
-        return Ok(getByNameResult);
+        return Ok(getByListResult);
     }
 
-    [HttpGet("GetList")]
-    public async Task<ActionResult<List<CreateRoomRequest>>> GetList()
+    /// <summary>
+    /// Get Avalibility Rooms
+    /// </summary>
+    /// <param name="roomAvalibilityRequest"></param>
+    /// <returns></returns>
+    [HttpGet("GetAvalibityRooms")]
+    public async Task<ActionResult<List<CreateRoomRequest>>> GetAvalibityRooms([FromQuery] RoomAvalibilityRequest roomAvalibilityRequest)
     {
-        var getByListResult = await _roomService.GetListAsync();        
+        var getByListResult = await _roomService.GetAvalibilityRoomAsync(roomAvalibilityRequest);
 
         if (!getByListResult.IsSuccess)
             return UnprocessableEntity(getByListResult);

@@ -38,6 +38,28 @@ namespace RoomReservation.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Equipments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Projektor"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Tablica"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Zestaw do wideokonferencji"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Ekran"
+                        });
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.Reservation", b =>
@@ -52,9 +74,6 @@ namespace RoomReservation.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoomLayout")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -107,10 +126,10 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MaxTime")
+                    b.Property<int?>("MaxTime")
                         .HasColumnType("int");
 
-                    b.Property<int>("MinTime")
+                    b.Property<int?>("MinTime")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomId")
@@ -150,7 +169,7 @@ namespace RoomReservation.Infrastructure.Migrations
                     b.ToTable("RoomsEquipments");
                 });
 
-            modelBuilder.Entity("RoomReservation.Domain.Entities.Users", b =>
+            modelBuilder.Entity("RoomReservation.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -158,17 +177,37 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Login")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Password = "IdioP+/nL+5jf8yWL3tVYWMa5g6sgNIs5w4JFQNXuEs=",
+                            Username = "jnowak"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Password = "Ix7MfReNpfIpg7xXlZk5bWwTmkV5h64e4AJtiEMtanI=",
+                            Username = "kkowalski"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Password = "VOoS58R1AHocCK0wA764P3UC5yn2xjOL5ZfEggL9MAU=",
+                            Username = "unowakowski"
+                        });
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.Reservation", b =>
@@ -179,8 +218,8 @@ namespace RoomReservation.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RoomReservation.Domain.Entities.Users", "User")
-                        .WithMany()
+                    b.HasOne("RoomReservation.Domain.Entities.User", "User")
+                        .WithMany("Reservations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -232,6 +271,11 @@ namespace RoomReservation.Infrastructure.Migrations
                     b.Navigation("RoomReservationLimit");
 
                     b.Navigation("RoomsEquipments");
+                });
+
+            modelBuilder.Entity("RoomReservation.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618
         }

@@ -36,18 +36,18 @@ namespace RoomReservation.Application.Services
             return _mapper.Map<Result<RoomDto>>(createRoomResult);
         }
 
-        public async Task<Result<bool>> DeleteAsync(int roomId)
+        public async Task<Result> DeleteAsync(int roomId)
         {
             var deleteResult = await _roomRepository.DeleteAsync(roomId);
 
             return deleteResult;
         }
 
-        public async Task <Result<RoomDto>> UpdateAsync(RoomDto updateRoom)
+        public async Task<Result<RoomDto>> UpdateAsync(RoomDto updateRoom)
         {
-            var roomResult =  await _roomRepository.UpdateAsync(_mapper.Map<Room>(updateRoom));
-            
-            return  _mapper.Map<Result<RoomDto>>(roomResult);
+            var roomResult = await _roomRepository.UpdateAsync(updateRoom);
+
+            return _mapper.Map<Result<RoomDto>>(roomResult);
         }
         public async Task<Result<RoomDto>> GetByNameAsync(string name)
         {
@@ -56,12 +56,18 @@ namespace RoomReservation.Application.Services
             return _mapper.Map<Result<RoomDto>>(roomResult);
         }
 
-        public async Task<Result<List<RoomDto>>> GetListAsync()
+        public async Task<Result<List<RoomDto>>> GetListAsync(RoomFilter roomFilter)
         {
-            var roomsResult = await _roomRepository.GetListAsync();
+            var roomsResult = await _roomRepository.GetListAsync(roomFilter);
 
             return _mapper.Map<Result<List<RoomDto>>>(roomsResult);
         }
+        public async Task<Result<List<RoomDto>>> GetAvalibilityRoomAsync(RoomAvalibilityRequest roomAvalibilityRequest)
+        {
+            var roomsResult = await _roomRepository.GetAvalibilityRoomAsync(roomAvalibilityRequest);
 
+            return _mapper.Map<Result<List<RoomDto>>>(roomsResult);
+
+        }
     }
 }

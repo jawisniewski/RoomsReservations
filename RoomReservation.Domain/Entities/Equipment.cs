@@ -8,8 +8,8 @@ namespace RoomReservation.Domain.Entities
 {
     public class Equipment
     {
-        public required int Id { get; set; }
+        public int Id { get; set; } 
         public required string Name { get; set; }
-        public List<RoomsEquipments>? RoomsEquipments { get; set; }
+        public virtual List<RoomsEquipments>? RoomsEquipments { get; set; }
     }
 }

@@ -1,4 +1,8 @@
 ﻿using AutoMapper;
+using RoomReservation.Application.DTOs.Equipment;
+using RoomReservation.Application.DTOs.Reservation;
+using RoomReservation.Application.DTOs.Reservation.CreateReservation;
+using RoomReservation.Application.DTOs.Reservation.UpdateReservation;
 using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.DTOs.Room.CreateRoom;
 using RoomReservation.Domain.Entities;
@@ -15,17 +19,19 @@ namespace RoomReservation.Application.Mapper
     {
         public MapperProfile()
         {
-            CreateMap<CreateRoomRequest, Room>().ReverseMap();
-            CreateMap<CreateRoomEquipmentRequest, Equipment>().ReverseMap();
-            CreateMap<CreateRoomReservationLimitRequest, RoomReservationLimit>().ReverseMap();
-            CreateMap<RoomDto, Room>().ReverseMap();
-            CreateMap<RoomEquipmentDto, Equipment>().ReverseMap();
+            CreateMap<CreateRoomRequest, Room>().ReverseMap();           
             CreateMap<RoomReservationLimitDto, RoomReservationLimit>().ReverseMap();
+            CreateMap<RoomDto, Room>().ReverseMap();
+            CreateMap<RoomEquipmentDto, RoomsEquipments>()
+                .ForMember(dest => dest.EquipmentId, opt => opt.MapFrom(src => src.EquipmentType)).ReverseMap();
             CreateMap<RoomDto, Room>().ReverseMap();
             CreateMap<Result<RoomDto>, Result<Room>>().ReverseMap();
             CreateMap<Result<List<RoomDto>>, Result<List<Room>>>().ReverseMap();
-
-
+            CreateMap<Result<ReservationDto>, Result<Reservation>>().ReverseMap();
+            CreateMap<Result<List<ReservationDto>>, Result<List<Reservation>>>().ReverseMap();
+            CreateMap<CreateReservationRequest, Reservation>().ReverseMap();
+            CreateMap<UpdateReservationRequest, Reservation>().ReverseMap();
+            CreateMap<ReservationDto, Reservation>().ReverseMap();
         }
     }
 }
