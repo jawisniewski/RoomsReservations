@@ -49,12 +49,6 @@ namespace RoomReservation.Application.Services
 
             return _mapper.Map<Result<RoomDto>>(roomResult);
         }
-        public async Task<Result<RoomDto>> GetByNameAsync(string name)
-        {
-            var roomResult = await _roomRepository.GetByNameAsync(name);
-
-            return _mapper.Map<Result<RoomDto>>(roomResult);
-        }
 
         public async Task<Result<List<RoomDto>>> GetListAsync(RoomFilter roomFilter)
         {

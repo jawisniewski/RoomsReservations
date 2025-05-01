@@ -54,9 +54,9 @@ namespace RoomReservation.API.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task<ActionResult> Delete(int roomId)
+        public async Task<ActionResult> Delete(int reservationId)
         {
-            var deleteResult = await _reservationService.DeleteAsync(roomId, User.GetUserId());
+            var deleteResult = await _reservationService.DeleteAsync(reservationId, User.GetUserId());
 
             if (!deleteResult.IsSuccess)
                 return UnprocessableEntity(deleteResult);
