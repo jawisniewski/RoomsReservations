@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace RoomReservation.API.ExceptionHandler
 {
-    internal sealed class GlobalExceptionHandler : IExceptionHandler
+    class GlobalExceptionHandler : IExceptionHandler
     {
         private readonly ILogger<GlobalExceptionHandler> _logger;
 
@@ -23,7 +23,7 @@ namespace RoomReservation.API.ExceptionHandler
             var problemDetails = new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
-                Title = "Server error"
+                Title = "An error occurred, please try again later.",
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;

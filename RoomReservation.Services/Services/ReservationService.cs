@@ -9,6 +9,7 @@ using RoomReservation.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,7 +43,7 @@ namespace RoomReservation.Application.Services
             if (await _reservationRepository.UserHasReservationAsync(userId, reservationRequest.StartDate, reservationRequest.EndDate))
             {
                 _logger.LogWarning($"User have already a reservation {userId}");
-                return Result.Failure($"User {userId} have already a reservation", System.Net.HttpStatusCode.BadRequest);
+                return Result.Failure($"User {userId} have already a reservation", HttpStatusCode.BadRequest);
             }
 
             var result = await _reservationRepository.CreateAsync(reservation);
@@ -75,7 +76,7 @@ namespace RoomReservation.Application.Services
             {
                 _logger.LogWarning($"User {userId} have already a reservation");
 
-                return Result.Failure("User have already a reservation", System.Net.HttpStatusCode.BadRequest);
+                return Result.Failure("User have already a reservation", HttpStatusCode.BadRequest);
             }
 
             var result = await _reservationRepository.UpdateAsync(updateReservationRequest, userId);

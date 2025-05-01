@@ -59,7 +59,7 @@ public class RoomsController : ControllerBase
     }
 
     [HttpGet("GetList")]
-    public async Task<ActionResult<List<CreateRoomRequest>>> GetList([FromQuery] RoomFilter roomFilters)
+    public async Task<ActionResult<List<RoomDto>>> GetList([FromQuery] RoomFilter roomFilters)
     {
         var getByListResult = await _roomService.GetListAsync(roomFilters);        
 
@@ -75,7 +75,7 @@ public class RoomsController : ControllerBase
     /// <param name="roomAvalibilityRequest"></param>
     /// <returns></returns>
     [HttpGet("GetAvalibityRooms")]
-    public async Task<ActionResult<List<CreateRoomRequest>>> GetAvalibityRooms([FromQuery] RoomAvalibilityRequest roomAvalibilityRequest)
+    public async Task<ActionResult<List<RoomDto>>> GetAvalibityRooms([FromQuery] RoomAvalibilityRequest roomAvalibilityRequest)
     {
         var getByListResult = await _roomService.GetAvalibilityRoomAsync(roomAvalibilityRequest);
 

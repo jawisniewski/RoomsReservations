@@ -9,6 +9,7 @@ using RoomReservation.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,100 +27,143 @@ namespace RoomReservation.Infrastructure.Repositories
             _logger = logger;
 
         }
+
         public async Task<Result<Reservation>> CreateAsync(Reservation reservation)
         {
-            await _dbSet.AddAsync(reservation);
-
-            var result = await _context.SaveChangesAsync();
-
-            if (result == 0)
+            try
             {
-                _logger.LogError("Failed to create reservation");
+                await _dbSet.AddAsync(reservation);
 
-                return Result<Reservation>.Failure("Failed to create reservation", System.Net.HttpStatusCode.UnprocessableEntity);
+                var result = await _context.SaveChangesAsync();
+
+                if (result == 0)
+                {
+                    _logger.LogError("Failed to create reservation");
+
+                    return Result<Reservation>.Failure("Failed to create reservation", HttpStatusCode.UnprocessableEntity);
+                }
+
+                return Result<Reservation>.Success(reservation);
             }
-
-            return Result<Reservation>.Success(reservation);
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Failed to create reservation");
+                return Result<Reservation>.Failure("Failed to create reservation", HttpStatusCode.UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Create reservation error");
+                return Result<Reservation>.Failure(ex, HttpStatusCode.BadRequest);
+            }
         }
 
         public async Task<Result> DeleteAsync(int reservationId, int userId)
         {
-
-            var reservation = await _dbSet.FirstOrDefaultAsync(r => r.Id == reservationId);
-
-            if (reservation == null)
+            try
             {
-                _logger.LogWarning($"Reservation not found ${reservationId}");
 
-                return Result.Failure($"Reservation not found ${reservationId}", System.Net.HttpStatusCode.UnprocessableEntity);
+                var reservation = await _dbSet.FirstOrDefaultAsync(r => r.Id == reservationId);
+
+                if (reservation == null)
+                {
+                    _logger.LogWarning($"Reservation not found ${reservationId}");
+
+                    return Result.Failure($"Reservation not found ${reservationId}", HttpStatusCode.UnprocessableEntity);
+                }
+
+                if (!CheckUserAuthorization(reservation, userId))
+                {
+                    _logger.LogError($"User {userId} is not authorized to update reservation {reservation.Id}");
+
+                    return Result.Failure($"User {userId} is not authorized to update reservation {reservation.Id}", HttpStatusCode.Unauthorized);
+                }
+
+                _dbSet.Remove(reservation);
+
+                var result = await _context.SaveChangesAsync();
+
+                if (result == 0)
+                {
+                    _logger.LogError($"Failed to delete reservation ${reservationId}");
+
+                    return Result.Failure($"Failed to delete reservation ${reservationId}", HttpStatusCode.UnprocessableEntity);
+                }
+
+                return Result.Success();
             }
-
-            if (!CheckUserAuthorization(reservation, userId))
+            catch (DbUpdateException ex)
             {
-                _logger.LogError($"User {userId} is not authorized to update reservation {reservation.Id}");
-
-                return Result.Failure($"User {userId} is not authorized to update reservation {reservation.Id}", System.Net.HttpStatusCode.Unauthorized);
+                _logger.LogError(ex, "Failed to delete reservation");
+                return Result.Failure("Failed to delete reservation", HttpStatusCode.UnprocessableEntity);
             }
-
-            _dbSet.Remove(reservation);
-
-            var result = await _context.SaveChangesAsync();
-
-            if (result == 0)
+            catch (Exception ex)
             {
-                _logger.LogError($"Failed to delete reservation ${reservationId}");
-
-                return Result.Failure($"Failed to delete reservation ${reservationId}", System.Net.HttpStatusCode.UnprocessableEntity);
+                _logger.LogError(ex, "Delete reservation error");
+                return Result.Failure(ex, HttpStatusCode.BadRequest);
             }
-
-            return Result.Success();
         }
-
         public async Task<Result<List<Reservation>>> GetListAsync()
         {
-            var reservations = await _dbSet
-                .Include(x => x.Room)
-                .ToListAsync();
-
-            if (reservations == null || !reservations.Any())
+            try
             {
-                _logger.LogWarning("No reservations found");
+                var reservations = await _dbSet
+                    .Include(x => x.Room)
+                        .ThenInclude(r => r.RoomsEquipments)
+                    .Include(x => x.Room)
+                        .ThenInclude(r => r.RoomReservationLimit)
+                    .ToListAsync();
 
-                return Result<List<Reservation>>.Failure("No reservations found", System.Net.HttpStatusCode.NotFound);
+                return Result<List<Reservation>>.Success(reservations);
             }
-
-            return Result<List<Reservation>>.Success(reservations);
-
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Get reservations error");
+                return Result<List<Reservation>>.Failure(ex, HttpStatusCode.BadRequest);
+            }
         }
 
         public async Task<Result<Reservation>> UpdateAsync(UpdateReservationRequest reservation, int userId)
         {
-            var reservationEntity = await _dbSet.FirstOrDefaultAsync(r => r.Id == reservation.Id);
-
-            if (reservationEntity == null)
+            try
             {
-                _logger.LogWarning($"Reservation not found ${reservation.Id}");
-                return Result<Reservation>.Failure($"Reservation not found ${reservation.Id}", System.Net.HttpStatusCode.NotFound);
+                var reservationEntity = await _dbSet.FirstOrDefaultAsync(r => r.Id == reservation.Id);
+
+                if (reservationEntity == null)
+                {
+                    _logger.LogWarning($"Reservation not found ${reservation.Id}");
+                    return Result<Reservation>.Failure($"Reservation not found ${reservation.Id}", HttpStatusCode.NotFound);
+                }
+
+                if (!CheckUserAuthorization(reservationEntity, userId))
+                {
+                    _logger.LogError($"User {userId} is not authorized to update reservation {reservationEntity.Id}");
+                    return Result<Reservation>.Failure($"User {userId} is not authorized to update reservation {reservationEntity.Id}", HttpStatusCode.Unauthorized);
+                }
+
+                UpdateReservationProperties(reservation, reservationEntity);
+
+                var result = await _context.SaveChangesAsync();
+
+                if (result == 0)
+                {
+                    _logger.LogError($"Failed to update reservation ${reservation.Id}");
+
+                    return Result<Reservation>.Failure($"Failed to update reservation ${reservation.Id}", HttpStatusCode.UnprocessableEntity);
+                }
+
+                return Result<Reservation>.Success(reservationEntity);
             }
 
-            if (!CheckUserAuthorization(reservationEntity, userId))
+            catch (DbUpdateException ex)
             {
-                _logger.LogError($"User {userId} is not authorized to update reservation {reservationEntity.Id}");
-                return Result<Reservation>.Failure($"User {userId} is not authorized to update reservation {reservationEntity.Id}", System.Net.HttpStatusCode.Unauthorized);
+                _logger.LogError(ex, "Failed to update reservation");
+                return Result<Reservation>.Failure("Failed to update reservation", HttpStatusCode.UnprocessableEntity);
             }
-
-            UpdateReservationProperties(reservation, reservationEntity);
-
-            var result = await _context.SaveChangesAsync();
-
-            if (result == 0)
+            catch (Exception ex)
             {
-                _logger.LogError($"Failed to update reservation ${reservation.Id}");
-
-                return Result<Reservation>.Failure($"Failed to update reservation ${reservation.Id}", System.Net.HttpStatusCode.UnprocessableEntity);
+                _logger.LogError(ex, "Update reservation error");
+                return Result<Reservation>.Failure(ex, HttpStatusCode.BadRequest);
             }
-
-            return Result<Reservation>.Success(reservationEntity);
         }
 
         private static void UpdateReservationProperties(UpdateReservationRequest reservation, Reservation reservationEntity)
@@ -143,7 +187,7 @@ namespace RoomReservation.Infrastructure.Repositories
                   .AnyAsync(r =>
                       r.UserId == userId
                       && r.StartDate < endTime
-                      && r.EndDate > startTime 
+                      && r.EndDate > startTime
                       && reservationId != r.Id);
 
         }
