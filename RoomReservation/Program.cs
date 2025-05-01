@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.OpenApi.Models;
 using RoomReservation.API.Auth;
+using RoomReservation.API.ExceptionHandler;
 using RoomReservation.API.Validators;
 using RoomReservation.API.Validators.RoomValidators.RoomReservationLimitsValidator;
 using RoomReservation.Application.DTOs.Room;
@@ -21,7 +22,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 
-builder.Services.AddEndpointsApiExplorer(); 
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "BasicAuth", Version = "v1" });
@@ -66,6 +67,8 @@ builder.Services.AddShared();
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddValidatorsFromAssemblyContaining<RoomReservationLimitsValidator>();
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -73,7 +76,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

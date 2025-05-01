@@ -208,7 +208,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 roomsQuery = roomsQuery.Where(r => r.RoomsEquipments.Any(re => roomAvalibilityRequest.EquipmentIds.Contains(re.EquipmentId)));
         }
 
-        public async Task<Result> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate)
+        public async Task<Result> IsRoomAvailableAsync(int roomId, DateTime startDate, DateTime endDate, int? reservationId = null)
         {
             var room = await _dbSet
                 .Include(r => r.Reservations)
@@ -221,7 +221,7 @@ namespace RoomReservation.Infrastructure.Repositories
             if (room.Reservations == null || !room.Reservations.Any())
                 return Result.Success();
 
-            if (IsOverlappingReservation(room.Reservations, startDate, endDate))
+            if (IsOverlappingReservation(room.Reservations, startDate, endDate, reservationId))
                 return LogAndReturnFailure($"Room {room.Name}  reserved ", HttpStatusCode.Conflict);
 
             if (!IsReservationWithinLimits(room.RoomReservationLimit, startDate, endDate))
@@ -230,9 +230,9 @@ namespace RoomReservation.Infrastructure.Repositories
             return Result.Success();
         }
 
-        private bool IsOverlappingReservation(IEnumerable<Reservation> reservations, DateTime startDate, DateTime endDate)
+        private bool IsOverlappingReservation(IEnumerable<Reservation> reservations, DateTime startDate, DateTime endDate, int? reservationId)
         {
-            return reservations.Any(r => r.StartDate < endDate && r.EndDate > startDate);
+            return reservations.Any(r => r.StartDate < endDate && r.EndDate > startDate && r.Id != reservationId);
         }
 
         private bool IsReservationWithinLimits(RoomReservationLimit limit, DateTime startDate, DateTime endDate)

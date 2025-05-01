@@ -32,7 +32,7 @@ namespace RoomReservation.Application.Services
             var reservation = _mapper.Map<Domain.Entities.Reservation>(reservationRequest);
             reservation.UserId = userId;
 
-            var checkRoom = await _roomRepository.IsRoomAvailableAsync(reservationRequest.RoomId, reservationRequest.StartDate, reservationRequest.EndDate);
+            var checkRoom = await _roomRepository.IsRoomAvailableAsync(reservationRequest.RoomId, reservationRequest.StartDate, reservationRequest.EndDate, null);
 
             if (!checkRoom.IsSuccess)
             {
@@ -42,7 +42,7 @@ namespace RoomReservation.Application.Services
             if (await _reservationRepository.UserHasReservationAsync(userId, reservationRequest.StartDate, reservationRequest.EndDate))
             {
                 _logger.LogWarning($"User have already a reservation {userId}");
-                return Result.Failure($"User have already a reservation {userId} {reservationRequest.StartDate} -  {reservationRequest.EndDate}", System.Net.HttpStatusCode.BadRequest);
+                return Result.Failure($"User {userId} have already a reservation", System.Net.HttpStatusCode.BadRequest);
             }
 
             var result = await _reservationRepository.CreateAsync(reservation);
@@ -57,21 +57,21 @@ namespace RoomReservation.Application.Services
 
         public async Task<Result<List<ReservationDto>>> GetListAsync()
         {
-           var result = await _reservationRepository.GetListAsync();
+            var result = await _reservationRepository.GetListAsync();
 
             return _mapper.Map<Result<List<ReservationDto>>>(result);
         }
 
         public async Task<Result> UpdateAsync(UpdateReservationRequest updateReservationRequest, int userId)
         {
-            var checkRoom = await _roomRepository.IsRoomAvailableAsync(updateReservationRequest.RoomId, updateReservationRequest.StartDate, updateReservationRequest.EndDate);
+            var checkRoom = await _roomRepository.IsRoomAvailableAsync(updateReservationRequest.RoomId, updateReservationRequest.StartDate, updateReservationRequest.EndDate, updateReservationRequest.Id);
 
             if (!checkRoom.IsSuccess)
             {
                 return checkRoom;
             }
 
-            if (!await _reservationRepository.UserHasReservationAsync(userId, updateReservationRequest.StartDate, updateReservationRequest.EndDate, updateReservationRequest.Id))
+            if (await _reservationRepository.UserHasReservationAsync(userId, updateReservationRequest.StartDate, updateReservationRequest.EndDate, updateReservationRequest.Id))
             {
                 _logger.LogWarning($"User {userId} have already a reservation");
 
