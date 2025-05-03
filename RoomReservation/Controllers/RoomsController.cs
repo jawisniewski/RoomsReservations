@@ -1,7 +1,9 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RoomReservation.API.Helper;
 using RoomReservation.API.Validators;
+using RoomReservation.Application.DTOs;
 using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.DTOs.Room.CreateRoom;
 using RoomReservation.Application.Interfaces.Services;
@@ -24,49 +26,37 @@ public class RoomsController : ControllerBase
     }
 
     [HttpPost("Create")]
-    public async Task<ActionResult> Create([FromBody] CreateRoomRequest createRoom)
+    public async Task<IActionResult> Create([FromBody] CreateRoomRequest createRoom)
     {
-        var roomResult = await _roomService.CreateAsync(createRoom);
-        if (!roomResult.IsSuccess)
-            return UnprocessableEntity(roomResult);
+        var roomCreateResult = await _roomService.CreateAsync(createRoom);
 
-        return Ok(roomResult);
+        return roomCreateResult.ToActionResult();
 
     }
 
     [HttpPatch("Update")]
-    public async Task<ActionResult> Update([FromBody] RoomDto updateRoom)
+    public async Task<IActionResult> Update([FromBody] RoomDto updateRoom)
     {
         var roomResult = await _roomService.UpdateAsync(updateRoom);
 
-        if (!roomResult.IsSuccess)
-            return UnprocessableEntity(roomResult);
-
-        return Ok(roomResult);
+        return roomResult.ToActionResult();
 
     }
 
     [HttpDelete("Delete")]
-    public async Task<ActionResult> Delete(int roomId)
+    public async Task<IActionResult> Delete(BaseDeleteRequest deleteRequest)
     {
-       var deleteResult = await _roomService.DeleteAsync(roomId);
+       var deleteResult = await _roomService.DeleteAsync(deleteRequest.Id);
 
-        if (!deleteResult.IsSuccess)
-            return UnprocessableEntity(deleteResult);
-
-        return Ok();
-
+        return deleteResult.ToActionResult();
     }
 
     [HttpGet("GetList")]
-    public async Task<ActionResult<List<RoomDto>>> GetList([FromQuery] RoomFilter roomFilters)
+    public async Task<IActionResult> GetList([FromQuery] RoomFilter roomFilters)
     {
-        var getByListResult = await _roomService.GetListAsync(roomFilters);        
+        var getByListResult = await _roomService.GetListAsync(roomFilters);
 
-        if (!getByListResult.IsSuccess)
-            return UnprocessableEntity(getByListResult);
-
-        return Ok(getByListResult);
+        return getByListResult.ToActionResult();
     }
 
     /// <summary>
@@ -75,13 +65,9 @@ public class RoomsController : ControllerBase
     /// <param name="roomAvalibilityRequest"></param>
     /// <returns></returns>
     [HttpGet("GetAvalibityRooms")]
-    public async Task<ActionResult<List<RoomDto>>> GetAvalibityRooms([FromQuery] RoomAvalibilityRequest roomAvalibilityRequest)
+    public async Task<IActionResult> GetAvalibityRooms([FromQuery] RoomAvalibilityRequest roomAvalibilityRequest)
     {
         var getByListResult = await _roomService.GetAvalibilityRoomAsync(roomAvalibilityRequest);
-
-        if (!getByListResult.IsSuccess)
-            return UnprocessableEntity(getByListResult);
-
-        return Ok(getByListResult);
+        return getByListResult.ToActionResult();
     }
 }

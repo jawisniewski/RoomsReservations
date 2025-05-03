@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Equipment
 {
-    public class RoomEquipmentDto : BaseRoomEquipmentDto
+    public class CreateRoomEquipmentRequest : BaseRoomEquipmentDto
     {
-        public int? Id { get; set; }
     }
 }

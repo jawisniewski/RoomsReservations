@@ -16,6 +16,6 @@ namespace RoomReservation.Domain.Entities
         public required RoomLayoutEnum RoomLayout { get; set; }
         public virtual List<Reservation> Reservations { get; set; } = [];
         public virtual RoomReservationLimit? RoomReservationLimit { get; set; } 
-        public virtual List<RoomsEquipments> RoomsEquipments { get; set; } = [];
+        public virtual List<RoomEquipment> RoomsEquipments { get; set; } = [];
     }
 }

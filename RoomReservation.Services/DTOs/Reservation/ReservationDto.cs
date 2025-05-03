@@ -13,6 +13,5 @@ namespace RoomReservation.Application.DTOs.Reservation
         public required int Id { get; set; }
         public required int UserId { get; set; }
         public RoomDto? Room { get; set; }
-        public User? User { get; set; }
     }
 }

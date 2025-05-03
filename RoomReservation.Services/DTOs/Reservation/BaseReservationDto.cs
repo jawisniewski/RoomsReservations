@@ -14,13 +14,13 @@ namespace RoomReservation.Application.DTOs.Reservation
         public required DateTime StartDate
         {
             get { return _startDate; }
-            set { _startDate = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0); }
+            set { _startDate = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0, DateTimeKind.Utc); }
         }
 
         public required DateTime EndDate
         {
             get { return _endDate; }
-            set { _endDate = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0); }
+            set { _endDate = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0, DateTimeKind.Utc); }
         }
 
         public required int RoomId { get; set; }

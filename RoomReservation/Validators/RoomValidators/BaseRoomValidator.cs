@@ -15,7 +15,6 @@ namespace RoomReservation.API.Validators.Room
             checkName();
             CheckTableCount();
             CheckRoomLayout();
-            CheckEquipments();
             checkRoomLimits();
         }
 
@@ -31,8 +30,9 @@ namespace RoomReservation.API.Validators.Room
             RuleFor(e => e.Name)
             .NotEmpty()
                 .WithMessage("Name is required.")
-            .MaximumLength(300)
-                .WithMessage("Name must not exceed 300 characters.");
+            .Length(2, 300)
+                .WithMessage("Name must be beetwen 2 - 300 characters")
+                .When(rf => rf.Name is not null); ;
         }
 
         private void CheckTableCount()
@@ -61,37 +61,6 @@ namespace RoomReservation.API.Validators.Room
             });
         }
 
-        private void CheckEquipments()
-        {
-            RuleFor(e => e.RoomsEquipments.Count)
-                .NotEqual(0)
-                    .WithMessage("Equipments list must be specified");
-
-            RuleFor(e => e)
-                .Must(e => RequireEquipment(e.RoomsEquipments))
-                    .WithMessage("Equipments list require at least one projector, whiteboard or video conference");
-            RuleFor(e => e)
-                .Must(e => VideoConferenceRequires(e.RoomsEquipments))
-                    .When(e => e.RoomsEquipments.Any(eq => eq.EquipmentType == EquipmentTypeEnum.VideoConference && eq.Quantity > 0))
-                    .WithMessage("Video confrence require at least one projector or screen");
-        }
-
-        private bool RequireEquipment(List<RoomEquipmentDto> equipments)
-        {
-            return equipments.Any(e =>
-                (
-                    e.EquipmentType == EquipmentTypeEnum.Projector ||
-                    e.EquipmentType == EquipmentTypeEnum.Whiteboard ||
-                    e.EquipmentType == EquipmentTypeEnum.VideoConference
-                )
-                && e.Quantity > 0);
-        }
-        private bool VideoConferenceRequires(List<RoomEquipmentDto> equipments)
-        {
-            var hasProjector = equipments.Any(e => (e.EquipmentType == EquipmentTypeEnum.Projector || e.EquipmentType == EquipmentTypeEnum.Screen) &&
-                e.Quantity > 0);
-
-            return hasProjector;
-        }
+ 
     }
 }

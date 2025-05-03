@@ -9,6 +9,9 @@ using RoomReservation.Application.DTOs.Reservation.UpdateReservation;
 using RoomReservation.Shared.Common;
 using System.Security.Claims;
 using RoomReservation.API.UserClaims;
+using RoomReservation.API.Helper;
+using RoomReservation.Application.DTOs;
+using RoomReservation.Application.DTOs.Reservation;
 
 namespace RoomReservation.API.Controllers
 {
@@ -28,51 +31,50 @@ namespace RoomReservation.API.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult> Create([FromBody] CreateReservationRequest createReservationRequest)
+        public async Task<IActionResult> Create([FromBody] CreateReservationRequest createReservationRequest)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             int.TryParse(userIdClaim, out var userId);
 
             var reservationResult = await _reservationService.CreateAsync(createReservationRequest, User.GetUserId());
 
-            if (!reservationResult.IsSuccess)
-                return UnprocessableEntity(reservationResult);
+            if(reservationResult.IsSuccess)
+            {
+                return  ((Result<ReservationDto>)reservationResult).ToActionResult();
+            }
 
-            return Ok(reservationResult);
+            return reservationResult.ToActionResult();
         }
 
         [HttpPatch("Update")]
-        public async Task<ActionResult> Update([FromBody] UpdateReservationRequest updateReservationRequest)
+        public async Task<IActionResult> Update([FromBody] UpdateReservationRequest updateReservationRequest)
         {
-            var roomResult = await _reservationService.UpdateAsync(updateReservationRequest, User.GetUserId());
+            var updateReservationResult = await _reservationService.UpdateAsync(updateReservationRequest, User.GetUserId());
 
-            if (!roomResult.IsSuccess)
-                return UnprocessableEntity(roomResult);
+            if (updateReservationResult.IsSuccess)
+            {
+                return ((Result<ReservationDto>)updateReservationResult).ToActionResult();
+            }
 
-            return Ok(roomResult);
-
+            return updateReservationResult.ToActionResult();
         }
 
         [HttpDelete("Delete")]
-        public async Task<ActionResult> Delete(int reservationId)
+        public async Task<IActionResult> Delete(BaseDeleteRequest deleteRequest)
         {
-            var deleteResult = await _reservationService.DeleteAsync(reservationId, User.GetUserId());
+            var deleteResult = await _reservationService.DeleteAsync(deleteRequest.Id, User.GetUserId());
 
-            if (!deleteResult.IsSuccess)
-                return UnprocessableEntity(deleteResult);
-
-            return Ok();
+            return deleteResult.ToActionResult();
+         
         }
 
         [HttpGet("GetList")]
-        public async Task<ActionResult<List<CreateRoomRequest>>> GetList()
+        public async Task<IActionResult> GetList()
         {
             var getByListResult = await _reservationService.GetListAsync();
 
-            if (!getByListResult.IsSuccess)
-                return UnprocessableEntity(getByListResult);
-
-            return Ok(getByListResult);
+            return getByListResult.ToActionResult();
+           
         }
 
     }

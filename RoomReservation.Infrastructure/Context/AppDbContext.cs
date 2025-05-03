@@ -94,7 +94,7 @@ namespace RoomReservation.Infrastructure.Context
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<RoomReservationLimit> RoomsReservationLimits { get; set; }
-        public DbSet<RoomsEquipments> RoomsEquipments { get; set; }
+        public DbSet<RoomEquipment> RoomsEquipments { get; set; }
         public DbSet<User> Users { get; set; }
     }
 }

@@ -68,7 +68,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 {
                     _logger.LogWarning($"Reservation not found ${reservationId}");
 
-                    return Result.Failure($"Reservation not found ${reservationId}", HttpStatusCode.UnprocessableEntity);
+                    return Result.Failure($"Reservation not found ${reservationId}", HttpStatusCode.NotFound);
                 }
 
                 if (!CheckUserAuthorization(reservation, userId))

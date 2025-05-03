@@ -9,5 +9,7 @@ namespace RoomReservation.Application.DTOs.Equipment
 {
     public class BaseRoomEquipmentDto
     {
+        public required EquipmentTypeEnum EquipmentType { get; set; }
+        public int Quantity { get; set; }
     }
 }

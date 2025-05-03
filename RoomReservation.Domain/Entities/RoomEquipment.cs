@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Domain.Entities
 {
-    public class RoomsEquipments
+    public class RoomEquipment
     {
         public required int Id { get; set; }
         public int Quantity { get; set; }
