@@ -11,5 +11,6 @@ namespace RoomReservation.Application.DTOs.Room
     public class RoomDto : RoomBaseDto
     {
         public required int Id { get; set; }
+        public required List<RoomEquipmentDto> RoomsEquipments { get; set; }
     }
 }

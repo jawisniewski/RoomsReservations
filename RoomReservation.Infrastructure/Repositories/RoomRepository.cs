@@ -38,7 +38,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 return true;
 
             var durationMinutes = (endDate - startDate).TotalMinutes;
-            return (limit.MinTime == 0 || durationMinutes >= limit.MinTime) && (limit.MaxTime ==0  || durationMinutes <= limit.MaxTime);
+            return (limit.MinTime == 0 || durationMinutes >= limit.MinTime) && (limit.MaxTime == 0 || durationMinutes <= limit.MaxTime);
         }
 
         private Result LogAndReturnFailure(string message, HttpStatusCode statusCode)
@@ -55,8 +55,8 @@ namespace RoomReservation.Infrastructure.Repositories
                 roomsQuery = roomsQuery.Where(r => r.TableCount >= roomAvalibilityRequest.TableCount);
             if (roomAvalibilityRequest.RoomLayout != null)
                 roomsQuery = roomsQuery.Where(r => r.RoomLayout == roomAvalibilityRequest.RoomLayout);
-            if (roomAvalibilityRequest.EquipmentIds != null && roomAvalibilityRequest.EquipmentIds.Length > 0)
-                roomsQuery = roomsQuery.Where(r => r.RoomsEquipments.Any(re => roomAvalibilityRequest.EquipmentIds.Contains(re.EquipmentId)));
+            if (roomAvalibilityRequest.EquipmentTypes != null && roomAvalibilityRequest.EquipmentTypes.Length > 0)
+                roomsQuery = roomsQuery.Where(r => roomAvalibilityRequest.EquipmentTypes.Select(e => (int)e).ToArray().All(z => r.RoomsEquipments.Where(x => x.Quantity > 0).Select(re => re.EquipmentId).Contains(z)));
         }
         private void UpdateRoomProperties(RoomDto room, Room roomEntity)
         {
@@ -82,6 +82,36 @@ namespace RoomReservation.Infrastructure.Repositories
                     MinTime = room.RoomReservationLimit.MinTime,
                     MaxTime = room.RoomReservationLimit.MaxTime
                 };
+            }
+        }
+        private void UpdateRoomEquipments(RoomDto room, Room roomEntity)
+        {
+            if (roomEntity.RoomsEquipments != null)
+            {
+                roomEntity.RoomsEquipments.RemoveAll(re => !room.RoomsEquipments.Select(rre => rre.Id).Contains(re.Id));
+            }
+
+            if (roomEntity.RoomsEquipments is null)
+                roomEntity.RoomsEquipments = [];
+
+            foreach (var roomEquipment in room.RoomsEquipments.DistinctBy(x => x.EquipmentType))
+            {
+
+                var existingRoomEquipment = roomEntity.RoomsEquipments.FirstOrDefault(re => re.Id == roomEquipment.Id);
+                if (existingRoomEquipment != null)
+                {
+                    existingRoomEquipment.Quantity = roomEquipment.Quantity;
+                    existingRoomEquipment.EquipmentId = (int)roomEquipment.EquipmentType;
+                    continue;
+                }
+
+                roomEntity.RoomsEquipments.Add(new RoomEquipment()
+                {
+                    Id = 0,
+                    EquipmentId = (int)roomEquipment.EquipmentType,
+                    RoomId = roomEntity.Id,
+                    Quantity = roomEquipment.Quantity
+                });
             }
         }
         public async Task<Result<Room>> CreateAsync(Room room)
@@ -181,6 +211,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 var roomEntity = await _dbSet
                     .Where(r => r.Id == roomDto.Id)
                     .Include(x => x.RoomReservationLimit)
+                    .Include(r => r.RoomsEquipments)
                     .FirstOrDefaultAsync();
 
                 if (roomEntity == null)
@@ -190,8 +221,8 @@ namespace RoomReservation.Infrastructure.Repositories
                 }
 
                 UpdateRoomProperties(roomDto, roomEntity);
-
                 UpdateRoomReservationLimit(roomDto, roomEntity);
+                UpdateRoomEquipments(roomDto, roomEntity);
 
                 var result = await _context.SaveChangesAsync();
 
@@ -255,7 +286,7 @@ namespace RoomReservation.Infrastructure.Repositories
                     return Result.Success();
 
                 if (IsOverlappingReservation(room.Reservations, startDate, endDate, reservationId))
-                    return LogAndReturnFailure($"Room {room.Name}  reserved ", HttpStatusCode.Conflict);
+                    return LogAndReturnFailure($"Room {room.Name}  reserved ", HttpStatusCode.BadRequest);
 
                 if (!IsReservationWithinLimits(room.RoomReservationLimit, startDate, endDate))
                     return LogAndReturnFailure($"Room {room.Name} reservation is not in limits", HttpStatusCode.BadRequest);

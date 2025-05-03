@@ -11,14 +11,14 @@ namespace RoomReservation.API.Validators.ReservationValidators
         {
             RuleFor(r => r.StartDate)
                 .GreaterThan(DateTime.Now)
-                    .WithMessage("Reservation starting date must be after now");
+                    .WithMessage($"Reservation starting date must be after now - {DateTime.Now}");
             RuleFor(r => r.StartDate)
                 .LessThan(rr => rr.EndDate)
-                    .WithMessage("Reservation starting date must be before ending date");
+                    .WithMessage(r=> $"Reservation starting date must be before ending date - {r.EndDate}");
 
             RuleFor(rr => rr.RoomId)
                 .GreaterThan(0)
-                    .WithMessage("Room id must be specified");
+                    .WithMessage("Room id must be specified and greater then 0");
         }
     }
 }

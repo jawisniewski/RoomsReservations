@@ -22,7 +22,9 @@ namespace RoomReservation.Application.Mapper
             CreateMap<CreateRoomRequest, Room>().ReverseMap();           
             CreateMap<RoomReservationLimitDto, RoomReservationLimit>().ReverseMap();
             CreateMap<RoomDto, Room>().ReverseMap();
-            CreateMap<RoomEquipmentDto, RoomsEquipments>()
+            CreateMap<RoomEquipmentDto, RoomEquipment>()
+                .ForMember(dest => dest.EquipmentId, opt => opt.MapFrom(src => src.EquipmentType)).ReverseMap();
+            CreateMap<CreateRoomEquipmentRequest, RoomEquipment>()
                 .ForMember(dest => dest.EquipmentId, opt => opt.MapFrom(src => src.EquipmentType)).ReverseMap();
             CreateMap<RoomDto, Room>().ReverseMap();
             CreateMap<Result<RoomDto>, Result<Room>>().ReverseMap();

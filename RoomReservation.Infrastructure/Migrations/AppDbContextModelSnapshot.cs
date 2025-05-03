@@ -37,7 +37,7 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Equipments");
+                    b.ToTable("Equipments", (string)null);
 
                     b.HasData(
                         new
@@ -88,7 +88,7 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservations", (string)null);
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.Room", b =>
@@ -115,7 +115,7 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.RoomReservationLimit", b =>
@@ -140,7 +140,7 @@ namespace RoomReservation.Infrastructure.Migrations
                     b.HasIndex("RoomId")
                         .IsUnique();
 
-                    b.ToTable("RoomsReservationLimits");
+                    b.ToTable("RoomsReservationLimits", (string)null);
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.RoomsEquipments", b =>
@@ -166,7 +166,7 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("RoomsEquipments");
+                    b.ToTable("RoomsEquipments", (string)null);
                 });
 
             modelBuilder.Entity("RoomReservation.Domain.Entities.User", b =>
@@ -187,7 +187,7 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new
