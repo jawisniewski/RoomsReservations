@@ -14,16 +14,16 @@ namespace RoomReservation.API.Validators.Room
         }
         private void CheckEquipments()
         {
-            RuleFor(e => e.RoomsEquipments.Count)
+            RuleFor(e => e.RoomEquipments.Count)
                 .NotEqual(0)
                     .WithMessage("Equipments list must be specified");
 
             RuleFor(e => e)
-                .Must(e => RequireEquipment(e.RoomsEquipments))
+                .Must(e => RequireEquipment(e.RoomEquipments))
                     .WithMessage("Equipments list require at least one projector, whiteboard or video conference");
             RuleFor(e => e)
-                .Must(e => VideoConferenceRequires(e.RoomsEquipments))
-                    .When(e => e.RoomsEquipments.Any(eq => eq.EquipmentType == EquipmentTypeEnum.VideoConference && eq.Quantity > 0))
+                .Must(e => VideoConferenceRequires(e.RoomEquipments))
+                    .When(e => e.RoomEquipments.Any(eq => eq.EquipmentType == EquipmentTypeEnum.VideoConference && eq.Quantity > 0))
                     .WithMessage("Video confrence require at least one projector or screen");
         }
 

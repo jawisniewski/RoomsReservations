@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Reservation.CreateReservation
 {
+    /// <summary>
+    /// Model for create reservation
+    /// </summary>
     public class CreateReservationRequest : BaseReservationDto
     {
     }
