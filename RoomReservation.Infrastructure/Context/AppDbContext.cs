@@ -113,6 +113,14 @@ namespace RoomReservation.Infrastructure.Context
                     new RoomReservationLimit() { Id = 2, RoomId = 2, MaxTime = 0, MinTime = 0 },
                     new RoomReservationLimit() { Id = 3, RoomId = 3, MaxTime = 60, MinTime = 0 }
             ));
+            modelBuilder.Entity<Reservation>(u =>
+                u.HasData(
+                    new Reservation() { Id = 1, RoomId = 1, UserId = 1, StartDate = new DateTime(2025, 6, 6, 11, 00, 00), EndDate = new DateTime(2025, 6, 6, 12, 00, 00) },
+                    new Reservation() { Id = 2, RoomId = 1, UserId = 1, StartDate = new DateTime(2025, 6, 7, 11, 00, 00), EndDate = new DateTime(2025, 6, 7, 12, 00, 00) },
+                    new Reservation() { Id = 3, RoomId = 2, UserId = 1, StartDate = new DateTime(2025, 6, 7, 12, 00, 00), EndDate = new DateTime(2025, 6, 7, 13, 00, 00) },
+                    new Reservation() { Id = 4, RoomId = 3, UserId = 2, StartDate = new DateTime(2025, 6, 7, 12, 00, 00), EndDate = new DateTime(2025, 6, 7, 12, 50, 00) },
+                    new Reservation() { Id = 5, RoomId = 1, UserId = 3, StartDate = new DateTime(2025, 6, 7, 12, 00, 00), EndDate = new DateTime(2025, 6, 7, 13, 00, 00) }
+            ));
         }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Room> Rooms { get; set; }
