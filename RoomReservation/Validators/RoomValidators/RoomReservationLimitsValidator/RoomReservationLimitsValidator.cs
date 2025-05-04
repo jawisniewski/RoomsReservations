@@ -18,6 +18,7 @@ namespace RoomReservation.API.Validators.RoomValidators.RoomReservationLimitsVal
             RuleFor(rr => rr.MaxTime)
                 .GreaterThan(0)
                     .WithMessage("Maximum reservation time must be higher then 0 minutes");
+
             RuleFor(rr => rr.MaxTime)
                 .GreaterThan(rr => rr.MinTime)
                     .When(rr => rr.MaxTime != null && rr.MinTime != null)

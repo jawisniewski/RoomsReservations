@@ -38,7 +38,8 @@ namespace RoomReservation.Infrastructure.Repositories
                 return true;
 
             var durationMinutes = (endDate - startDate).TotalMinutes;
-            return (limit.MinTime == 0 || durationMinutes >= limit.MinTime) && (limit.MaxTime == 0 || durationMinutes <= limit.MaxTime);
+
+            return (!limit.MinTime.HasValue || limit.MinTime == 0 || durationMinutes >= limit.MinTime) && (!limit.MaxTime.HasValue || limit.MaxTime == 0 || durationMinutes <= limit.MaxTime);
         }
 
         private Result LogAndReturnFailure(string message, HttpStatusCode statusCode)
@@ -282,9 +283,6 @@ namespace RoomReservation.Infrastructure.Repositories
 
                 if (room == null)
                     return LogAndReturnFailure($"Room not found {roomId}", HttpStatusCode.NotFound);
-
-                if (room.Reservations == null || !room.Reservations.Any())
-                    return Result.Success();
 
                 if (IsOverlappingReservation(room.Reservations, startDate, endDate, reservationId))
                     return LogAndReturnFailure($"Room {room.Name} reserved ", HttpStatusCode.UnprocessableEntity);
