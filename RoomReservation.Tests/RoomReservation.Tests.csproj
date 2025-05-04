@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NUnit" Version="3.14.0" />
@@ -27,11 +28,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RoomReservation.Core\RoomReservation.Shared.csproj" />
+    <ProjectReference Include="..\RoomReservation.Infrastructure\RoomReservation.Infrastructure.csproj" />
     <ProjectReference Include="..\RoomReservation.Services\RoomReservation.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="InfrastructureTests\Configurators\" />
   </ItemGroup>
 
 </Project>
