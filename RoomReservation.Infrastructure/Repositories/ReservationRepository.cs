@@ -25,7 +25,6 @@ namespace RoomReservation.Infrastructure.Repositories
             _context = context;
             _dbSet = context.Set<Reservation>();
             _logger = logger;
-
         }
 
         public async Task<Result<Reservation>> CreateAsync(Reservation reservation)
@@ -33,16 +32,8 @@ namespace RoomReservation.Infrastructure.Repositories
             try
             {
                 await _dbSet.AddAsync(reservation);
-
-                var result = await _context.SaveChangesAsync();
-
-                if (result == 0)
-                {
-                    _logger.LogError("Failed to create reservation");
-
-                    return Result<Reservation>.Failure("Failed to create reservation", HttpStatusCode.UnprocessableEntity);
-                }
-
+                await _context.SaveChangesAsync();
+               
                 return Result<Reservation>.Success(reservation);
             }
             catch (DbUpdateException ex)
@@ -79,14 +70,7 @@ namespace RoomReservation.Infrastructure.Repositories
 
                 _dbSet.Remove(reservation);
 
-                var result = await _context.SaveChangesAsync();
-
-                if (result == 0)
-                {
-                    _logger.LogError($"Failed to delete reservation ${reservationId}");
-
-                    return Result.Failure($"Failed to delete reservation ${reservationId}", HttpStatusCode.UnprocessableEntity);
-                }
+                await _context.SaveChangesAsync();            
 
                 return Result.Success();
             }
