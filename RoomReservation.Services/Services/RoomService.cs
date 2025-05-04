@@ -24,14 +24,12 @@ namespace RoomReservation.Application.Services
             _logger = logger;
             _roomRepository = roomRepository;
             _mapper = mapper;
-
         }
 
         public async Task<Result<RoomDto>> CreateAsync(CreateRoomRequest room)
         {
             var roomEntity = _mapper.Map<Room>(room);
             var createRoomResult = await _roomRepository.CreateAsync(roomEntity);
-
 
             return _mapper.Map<Result<RoomDto>>(createRoomResult);
         }
