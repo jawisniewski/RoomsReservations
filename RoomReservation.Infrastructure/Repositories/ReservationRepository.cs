@@ -48,7 +48,7 @@ namespace RoomReservation.Infrastructure.Repositories
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Failed to create reservation");
-                return Result<Reservation>.Failure("Failed to create reservation", HttpStatusCode.UnprocessableEntity);
+                return Result<Reservation>.Failure("Failed to create reservation", HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {
@@ -61,7 +61,6 @@ namespace RoomReservation.Infrastructure.Repositories
         {
             try
             {
-
                 var reservation = await _dbSet.FirstOrDefaultAsync(r => r.Id == reservationId);
 
                 if (reservation == null)
@@ -75,7 +74,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 {
                     _logger.LogError($"User {userId} is not authorized to update reservation {reservation.Id}");
 
-                    return Result.Failure($"User {userId} is not authorized to update reservation {reservation.Id}", HttpStatusCode.Unauthorized);
+                    return Result.Failure($"User {userId} is not authorized to update reservation {reservation.Id}", HttpStatusCode.Forbidden);
                 }
 
                 _dbSet.Remove(reservation);
@@ -94,12 +93,12 @@ namespace RoomReservation.Infrastructure.Repositories
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Failed to delete reservation");
-                return Result.Failure("Failed to delete reservation", HttpStatusCode.UnprocessableEntity);
+                return Result.Failure("Failed to delete reservation", HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete reservation error");
-                return Result.Failure(ex, HttpStatusCode.BadRequest);
+                return Result.Failure("Delete reservation error", HttpStatusCode.BadRequest);
             }
         }
         public async Task<Result<List<Reservation>>> GetListAsync()
@@ -108,7 +107,7 @@ namespace RoomReservation.Infrastructure.Repositories
             {
                 var reservations = await _dbSet
                     .Include(x => x.Room)
-                        .ThenInclude(r => r.RoomsEquipments)
+                        .ThenInclude(r => r.RoomEquipments)
                     .Include(x => x.Room)
                         .ThenInclude(r => r.RoomReservationLimit)
                     .ToListAsync();
@@ -137,7 +136,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 if (!CheckUserAuthorization(reservationEntity, userId))
                 {
                     _logger.LogError($"User {userId} is not authorized to update reservation {reservationEntity.Id}");
-                    return Result<Reservation>.Failure($"User {userId} is not authorized to update reservation {reservationEntity.Id}", HttpStatusCode.Unauthorized);
+                    return Result<Reservation>.Failure($"User {userId} is not authorized to update reservation {reservationEntity.Id}", HttpStatusCode.Forbidden);
                 }
 
                 UpdateReservationProperties(reservation, reservationEntity);
@@ -157,7 +156,7 @@ namespace RoomReservation.Infrastructure.Repositories
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Failed to update reservation");
-                return Result<Reservation>.Failure("Failed to update reservation", HttpStatusCode.UnprocessableEntity);
+                return Result<Reservation>.Failure("Failed to update reservation", HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {

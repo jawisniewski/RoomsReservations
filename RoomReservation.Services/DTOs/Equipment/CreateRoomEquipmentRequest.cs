@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Equipment
 {
+    /// <summary>
+    /// Model for creating room equipment
+    /// </summary>
     public class CreateRoomEquipmentRequest : BaseRoomEquipmentDto
     {
     }

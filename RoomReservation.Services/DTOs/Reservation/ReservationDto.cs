@@ -8,10 +8,24 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Reservation
 {
+    /// <summary>
+    /// Reservation model
+    /// </summary>
     public class ReservationDto : BaseReservationDto
     {
+        /// <summary>
+        /// Reservation id
+        /// </summary>
+        /// <example> 1 </example>
         public required int Id { get; set; }
+        /// <summary>
+        /// User id
+        /// </summary>
+        /// <example> 1 </example>
         public required int UserId { get; set; }
+        /// <summary>
+        /// Reservation room>
+        /// </summary>
         public RoomDto? Room { get; set; }
     }
 }

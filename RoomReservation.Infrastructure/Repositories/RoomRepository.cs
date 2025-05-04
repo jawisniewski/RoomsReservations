@@ -56,7 +56,7 @@ namespace RoomReservation.Infrastructure.Repositories
             if (roomAvalibilityRequest.RoomLayout != null)
                 roomsQuery = roomsQuery.Where(r => r.RoomLayout == roomAvalibilityRequest.RoomLayout);
             if (roomAvalibilityRequest.EquipmentTypes != null && roomAvalibilityRequest.EquipmentTypes.Length > 0)
-                roomsQuery = roomsQuery.Where(r => roomAvalibilityRequest.EquipmentTypes.Select(e => (int)e).ToArray().All(z => r.RoomsEquipments.Where(x => x.Quantity > 0).Select(re => re.EquipmentId).Contains(z)));
+                roomsQuery = roomsQuery.Where(r => roomAvalibilityRequest.EquipmentTypes.Select(e => (int)e).ToArray().All(z => r.RoomEquipments.Where(x => x.Quantity > 0).Select(re => re.EquipmentId).Contains(z)));
         }
         private void UpdateRoomProperties(RoomDto room, Room roomEntity)
         {
@@ -86,18 +86,18 @@ namespace RoomReservation.Infrastructure.Repositories
         }
         private void UpdateRoomEquipments(RoomDto room, Room roomEntity)
         {
-            if (roomEntity.RoomsEquipments != null)
+            if (roomEntity.RoomEquipments != null)
             {
-                roomEntity.RoomsEquipments.RemoveAll(re => !room.RoomsEquipments.Select(rre => rre.Id).Contains(re.Id));
+                roomEntity.RoomEquipments.RemoveAll(re => !room.RoomEquipments.Select(rre => rre.Id).Contains(re.Id));
             }
 
-            if (roomEntity.RoomsEquipments is null)
-                roomEntity.RoomsEquipments = [];
+            if (roomEntity.RoomEquipments is null)
+                roomEntity.RoomEquipments = [];
 
-            foreach (var roomEquipment in room.RoomsEquipments.DistinctBy(x => x.EquipmentType))
+            foreach (var roomEquipment in room.RoomEquipments.DistinctBy(x => x.EquipmentType))
             {
 
-                var existingRoomEquipment = roomEntity.RoomsEquipments.FirstOrDefault(re => re.Id == roomEquipment.Id);
+                var existingRoomEquipment = roomEntity.RoomEquipments.FirstOrDefault(re => re.Id == roomEquipment.Id);
                 if (existingRoomEquipment != null)
                 {
                     existingRoomEquipment.Quantity = roomEquipment.Quantity;
@@ -105,7 +105,7 @@ namespace RoomReservation.Infrastructure.Repositories
                     continue;
                 }
 
-                roomEntity.RoomsEquipments.Add(new RoomEquipment()
+                roomEntity.RoomEquipments.Add(new RoomEquipment()
                 {
                     Id = 0,
                     EquipmentId = (int)roomEquipment.EquipmentType,
@@ -134,7 +134,7 @@ namespace RoomReservation.Infrastructure.Repositories
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Failed to create room");
-                return Result<Room>.Failure("Failed to create room", HttpStatusCode.UnprocessableEntity);
+                return Result<Room>.Failure("Failed to create room", HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {
@@ -173,12 +173,12 @@ namespace RoomReservation.Infrastructure.Repositories
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Failed to delete room");
-                return Result.Failure("Failed to delete room", HttpStatusCode.UnprocessableEntity);
+                return Result.Failure("Failed to delete room", HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete room error");
-                return Result.Failure(ex, HttpStatusCode.BadRequest);
+                return Result.Failure("Delete room error", HttpStatusCode.BadRequest);
             }
         }
 
@@ -187,7 +187,7 @@ namespace RoomReservation.Infrastructure.Repositories
             try
             {
                 var roomsQuery = _dbSet
-                    .Include(ri => ri.RoomsEquipments)
+                    .Include(ri => ri.RoomEquipments)
                         .ThenInclude(i => i.Equipment)
                     .Include(x => x.RoomReservationLimit).AsQueryable();
 
@@ -211,7 +211,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 var roomEntity = await _dbSet
                     .Where(r => r.Id == roomDto.Id)
                     .Include(x => x.RoomReservationLimit)
-                    .Include(r => r.RoomsEquipments)
+                    .Include(r => r.RoomEquipments)
                     .FirstOrDefaultAsync();
 
                 if (roomEntity == null)
@@ -253,7 +253,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 var roomsQuery = _dbSet
                     .Where(r =>
                         !r.Reservations.Any(re => re.StartDate < roomAvalibilityRequest.AvailableTo && re.EndDate > roomAvalibilityRequest.AvailableFrom))
-                    .Include(r => r.RoomsEquipments)
+                    .Include(r => r.RoomEquipments)
                         .ThenInclude(r => r.Equipment)
                     .Include(rrl => rrl.RoomReservationLimit).AsQueryable();
 
@@ -286,17 +286,17 @@ namespace RoomReservation.Infrastructure.Repositories
                     return Result.Success();
 
                 if (IsOverlappingReservation(room.Reservations, startDate, endDate, reservationId))
-                    return LogAndReturnFailure($"Room {room.Name}  reserved ", HttpStatusCode.BadRequest);
+                    return LogAndReturnFailure($"Room {room.Name} reserved ", HttpStatusCode.UnprocessableEntity);
 
                 if (!IsReservationWithinLimits(room.RoomReservationLimit, startDate, endDate))
-                    return LogAndReturnFailure($"Room {room.Name} reservation is not in limits", HttpStatusCode.BadRequest);
+                    return LogAndReturnFailure($"Room {room.Name} reservation is not in limits", HttpStatusCode.UnprocessableEntity);
 
                 return Result.Success();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Check room availability error");
-                return Result.Failure(ex, HttpStatusCode.BadRequest);
+                return Result.Failure("Check room availability error", HttpStatusCode.BadRequest);
             }
         }
     }

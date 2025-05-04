@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Application.DTOs.Reservation.UpdateReservation
 {
+    /// <summary>
+    /// Model for update reservation
+    /// </summary>
     public class UpdateReservationRequest: BaseReservationDto
     {
+        /// <summary>
+        /// Id of the reservation
+        /// </summary>
+        /// <example>1</example>
         public required int Id { get; set; }
     }
 }

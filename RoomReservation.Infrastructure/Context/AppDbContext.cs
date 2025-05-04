@@ -29,7 +29,7 @@ namespace RoomReservation.Infrastructure.Context
                     .IsRequired()
                     .HasMaxLength(300);
 
-                r.HasMany(r => r.RoomsEquipments)
+                r.HasMany(r => r.RoomEquipments)
                     .WithOne(re => re.Room)
                     .HasForeignKey(re => re.RoomId);
 
@@ -52,7 +52,7 @@ namespace RoomReservation.Infrastructure.Context
                     .IsRequired()
                     .HasMaxLength(300);
 
-                e.HasMany(e => e.RoomsEquipments)
+                e.HasMany(e => e.RoomEquipments)
                     .WithOne(re => re.Equipment)
                     .HasForeignKey(re => re.EquipmentId);
                 e.HasData(

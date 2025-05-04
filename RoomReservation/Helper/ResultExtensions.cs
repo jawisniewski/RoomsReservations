@@ -14,7 +14,6 @@ namespace RoomReservation.API.Helper
             {
                 Title = result.StatusCode.ToString(),
                 Detail = result.FailureMessage,
-                Status = (int)result.StatusCode
             };
 
             return new ObjectResult(problem) { StatusCode = (int)result.StatusCode };
@@ -28,7 +27,6 @@ namespace RoomReservation.API.Helper
             {
                 Title = result.StatusCode.ToString(),
                 Detail = result.FailureMessage,
-                Status = (int)result.StatusCode
             };
 
             return new ObjectResult(problem) { StatusCode = (int)result.StatusCode };

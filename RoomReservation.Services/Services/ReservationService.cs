@@ -43,7 +43,7 @@ namespace RoomReservation.Application.Services
             if (await _reservationRepository.UserHasReservationAsync(userId, reservationRequest.StartDate, reservationRequest.EndDate))
             {
                 _logger.LogWarning($"User have already a reservation {userId}");
-                return Result.Failure($"User {userId} have already a reservation", HttpStatusCode.BadRequest);
+                return Result.Failure($"User {userId} have already a reservation", HttpStatusCode.Forbidden);
             }
 
             var result = await _reservationRepository.CreateAsync(reservation);
@@ -76,7 +76,7 @@ namespace RoomReservation.Application.Services
             {
                 _logger.LogWarning($"User {userId} have already a reservation");
 
-                return Result.Failure("User have already a reservation", HttpStatusCode.BadRequest);
+                return Result.Failure("User have already a reservation", HttpStatusCode.Conflict);
             }
 
             var result = await _reservationRepository.UpdateAsync(updateReservationRequest, userId);
