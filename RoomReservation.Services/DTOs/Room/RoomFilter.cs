@@ -18,17 +18,17 @@ namespace RoomReservation.Application.DTOs.Room
         /// <summary>
         /// Count of tables
         /// </summary>
-        /// <example>10</example>
+        /// <example>4</example>
         public int? TableCount { get; set; }
         /// <summary>
         /// Name of room
         /// </summary>
-        /// <example> Sala konferencyjna 1</example>
+        /// <example>Sala konferencyjna 5</example>
         public string? Name { get; set; }
         /// <summary>
         /// Minimum capacity of room
         /// </summary>
-        /// <example>5</example>
+        /// <example>10</example>
         public int? Capacity { get; set; }
         /// <summary>
         /// Layout of room: Boardroom, Theater, Classroom

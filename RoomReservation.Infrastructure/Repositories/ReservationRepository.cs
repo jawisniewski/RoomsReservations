@@ -141,14 +141,7 @@ namespace RoomReservation.Infrastructure.Repositories
 
                 UpdateReservationProperties(reservation, reservationEntity);
 
-                var result = await _context.SaveChangesAsync();
-
-                if (result == 0)
-                {
-                    _logger.LogError($"Failed to update reservation ${reservation.Id}");
-
-                    return Result<Reservation>.Failure($"Failed to update reservation ${reservation.Id}", HttpStatusCode.UnprocessableEntity);
-                }
+                await _context.SaveChangesAsync();
 
                 return Result<Reservation>.Success(reservationEntity);
             }

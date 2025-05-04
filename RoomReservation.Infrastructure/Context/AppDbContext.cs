@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RoomReservation.Domain.Entities;
+using RoomReservation.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -40,6 +41,7 @@ namespace RoomReservation.Infrastructure.Context
                 r.HasMany(r => r.Reservations)
                     .WithOne(r => r.Room)
                     .HasForeignKey(r => r.RoomId);
+                r.HasIndex(u => u.Name).IsUnique();
             });
 
             modelBuilder.Entity<Equipment>(e =>
@@ -89,6 +91,28 @@ namespace RoomReservation.Infrastructure.Context
                     new User { Id = 2, Username = "kkowalski", Password = "Ix7MfReNpfIpg7xXlZk5bWwTmkV5h64e4AJtiEMtanI=" },
                     new User { Id = 3, Username = "unowakowski", Password = "VOoS58R1AHocCK0wA764P3UC5yn2xjOL5ZfEggL9MAU=" })
             );
+            modelBuilder.Entity<Room>(u =>
+                u.HasData(
+                    new Room() { Id = 1, Name = "Klasa", Capacity = 30, RoomLayout = RoomLayoutEnum.Classroom, TableCount = 20 },
+                    new Room() { Id = 2, Name = "Sala konferencyjna 5", Capacity = 10, RoomLayout = RoomLayoutEnum.Boardroom, TableCount = 4 },
+                    new Room() { Id = 3, Name = "Scena", Capacity = 100, RoomLayout = RoomLayoutEnum.Theater, TableCount = 0 }
+            ));
+            modelBuilder.Entity<RoomEquipment>(u =>
+                u.HasData(
+                    new RoomEquipment() { Id = 1, EquipmentId = 1, RoomId = 1, Quantity = 2},
+                    new RoomEquipment() { Id = 2, EquipmentId = 2, RoomId = 1, Quantity = 0 },
+                    new RoomEquipment() { Id = 3, EquipmentId = 3, RoomId = 1, Quantity = 1 },
+                    new RoomEquipment() { Id = 4, EquipmentId = 4, RoomId = 1, Quantity = 1 },
+                    new RoomEquipment() { Id = 5, RoomId = 2, EquipmentId = 1, Quantity = 3 },
+                    new RoomEquipment() { Id = 6, RoomId = 2, EquipmentId = 3, Quantity = 4 },
+                    new RoomEquipment() { Id = 7, RoomId = 3, EquipmentId = 2, Quantity = 1 }
+            ));
+            modelBuilder.Entity<RoomReservationLimit>(u =>
+                u.HasData(
+                    new RoomReservationLimit() { Id = 1, RoomId = 1, MaxTime = 90, MinTime= 30 },
+                    new RoomReservationLimit() { Id = 2, RoomId = 2, MaxTime = 0, MinTime = 0 },
+                    new RoomReservationLimit() { Id = 3, RoomId = 3, MaxTime = 60, MinTime = 0 }
+            ));
         }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Room> Rooms { get; set; }

@@ -17,21 +17,21 @@ namespace RoomReservation.Application.DTOs.Room
         /// <summary>
         /// Name of room
         /// </summary>
-        /// <example> Sala konferencyjna 1</example>
+        /// <example>Sala konferencyjna 1</example>
         [Required]
         public required string Name { get; set; }
 
         /// <summary>
         /// Capacity
         /// </summary>
-        /// <example>20</example>
+        /// <example>15</example>
         [Required]
         public required int Capacity { get; set; }
 
         /// <summary>
         /// Table count
         /// </summary>
-        /// <example> 3 </example>
+        /// <example> 5 </example>
         [Required]
         public required int TableCount { get; set; }
 
