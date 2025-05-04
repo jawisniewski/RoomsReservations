@@ -1,4 +1,4 @@
-# RoomsReservations
+# Rezerwacja sal
 ## Wymagania
 - Net SDK 8 + https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 - Baza danych SQLServer
