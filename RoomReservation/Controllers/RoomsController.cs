@@ -36,10 +36,12 @@ public class RoomsController : ControllerBase
     /// <response code="200">Room created</response>
     /// <response code="400">Validation error</response>
     /// <response code="404">Not found</response>
+    /// <response code="409">Room with this name exists</response>
     /// <response code="422">Create room cannot be proceed </response>
     [ProducesResponseType(typeof(RoomDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Result), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(Result), StatusCodes.Status422UnprocessableEntity)]
 
     [HttpPost("Create")]
@@ -59,10 +61,12 @@ public class RoomsController : ControllerBase
     /// <response code="200">Room updated</response>
     /// <response code="400">Validation error</response>
     /// <response code="404">Not found</response>
+    /// <response code="409">Room with this name exists</response>
     /// <response code="422">Update room cannot be proceed </response>
     [ProducesResponseType(typeof(RoomDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Result), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(Result), StatusCodes.Status422UnprocessableEntity)]
     [HttpPut("Update")]
     public async Task<IActionResult> Update([FromBody] RoomDto updateRoom)

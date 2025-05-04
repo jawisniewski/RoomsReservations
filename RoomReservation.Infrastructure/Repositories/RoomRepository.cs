@@ -51,6 +51,8 @@ namespace RoomReservation.Infrastructure.Repositories
         {
             if (roomAvalibilityRequest.Capacity != null)
                 roomsQuery = roomsQuery.Where(r => r.Capacity >= roomAvalibilityRequest.Capacity);
+            if (roomAvalibilityRequest.Name != null)
+                roomsQuery = roomsQuery.Where(r => r.Name.ToLower().Contains(roomAvalibilityRequest.Name.ToLower()));
             if (roomAvalibilityRequest.TableCount != null)
                 roomsQuery = roomsQuery.Where(r => r.TableCount >= roomAvalibilityRequest.TableCount);
             if (roomAvalibilityRequest.RoomLayout != null)
@@ -118,16 +120,15 @@ namespace RoomReservation.Infrastructure.Repositories
         {
             try
             {
+                if (_dbSet.Any(r => r.Name == room.Name))
+                {
+                    _logger.LogError($"Room with name {room.Name} already exists");
+                    return Result<Room>.Failure($"Room with name {room.Name} already exists", HttpStatusCode.Conflict);
+                }
+
                 await _dbSet.AddAsync(room);
 
                 var result = await _context.SaveChangesAsync();
-
-                if (result == 0)
-                {
-                    _logger.LogError("Failed to create room");
-
-                    return Result<Room>.Failure("Failed to create room", HttpStatusCode.UnprocessableEntity);
-                }
 
                 return Result<Room>.Success(room);
             }
@@ -208,6 +209,12 @@ namespace RoomReservation.Infrastructure.Repositories
         {
             try
             {
+                if (_dbSet.Any(r => r.Name == roomDto.Name && roomDto.Id != r.Id))
+                {
+                    _logger.LogError($"Room with name {roomDto.Name} already exists");
+                    return Result<Room>.Failure($"Room with name {roomDto.Name} already exists", HttpStatusCode.Conflict);
+                }
+
                 var roomEntity = await _dbSet
                     .Where(r => r.Id == roomDto.Id)
                     .Include(x => x.RoomReservationLimit)
@@ -224,13 +231,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 UpdateRoomReservationLimit(roomDto, roomEntity);
                 UpdateRoomEquipments(roomDto, roomEntity);
 
-                var result = await _context.SaveChangesAsync();
-
-                if (result == 0)
-                {
-                    _logger.LogError("Failed to update room");
-                    return Result<Room>.Failure("Failed to update room", HttpStatusCode.UnprocessableEntity);
-                }
+                await _context.SaveChangesAsync();
 
                 return Result<Room>.Success(roomEntity);
             }

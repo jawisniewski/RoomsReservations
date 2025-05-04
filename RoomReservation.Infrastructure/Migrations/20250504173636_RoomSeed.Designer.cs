@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RoomReservation.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using RoomReservation.Infrastructure.Context;
 namespace RoomReservation.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250504173636_RoomSeed")]
+    partial class RoomSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,9 +118,6 @@ namespace RoomReservation.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Rooms");
 
                     b.HasData(
@@ -177,7 +177,7 @@ namespace RoomReservation.Infrastructure.Migrations
                         {
                             Id = 1,
                             EquipmentId = 1,
-                            Quantity = 2,
+                            Quantity = 0,
                             RoomId = 1
                         },
                         new
@@ -191,35 +191,35 @@ namespace RoomReservation.Infrastructure.Migrations
                         {
                             Id = 3,
                             EquipmentId = 3,
-                            Quantity = 1,
+                            Quantity = 0,
                             RoomId = 1
                         },
                         new
                         {
                             Id = 4,
                             EquipmentId = 4,
-                            Quantity = 1,
+                            Quantity = 0,
                             RoomId = 1
                         },
                         new
                         {
                             Id = 5,
                             EquipmentId = 1,
-                            Quantity = 3,
+                            Quantity = 0,
                             RoomId = 2
                         },
                         new
                         {
                             Id = 6,
                             EquipmentId = 3,
-                            Quantity = 4,
+                            Quantity = 0,
                             RoomId = 2
                         },
                         new
                         {
                             Id = 7,
                             EquipmentId = 2,
-                            Quantity = 1,
+                            Quantity = 0,
                             RoomId = 3
                         });
                 });
