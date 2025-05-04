@@ -117,6 +117,7 @@ namespace RoomReservation.Infrastructure.Repositories
                 });
             }
         }
+
         public async Task<Result<Room>> CreateAsync(Room room)
         {
             try
@@ -162,13 +163,6 @@ namespace RoomReservation.Infrastructure.Repositories
                 _dbSet.Remove(room);
 
                 var result = await _context.SaveChangesAsync();
-
-                if (result == 0)
-                {
-                    _logger.LogError($"Failed to delete room ${roomId}");
-
-                    return Result.Failure($"Failed to delete room ${roomId}", HttpStatusCode.UnprocessableEntity);
-                }
 
                 return Result.Success();
             }
@@ -224,8 +218,8 @@ namespace RoomReservation.Infrastructure.Repositories
 
                 if (roomEntity == null)
                 {
-                    _logger.LogError($"Room not found ${roomDto.Id}");
-                    return Result<Room>.Failure($"Room not found ${roomDto.Id}", HttpStatusCode.NotFound);
+                    _logger.LogError($"Room not found {roomDto.Id}");
+                    return Result<Room>.Failure($"Room not found {roomDto.Id}", HttpStatusCode.NotFound);
                 }
 
                 UpdateRoomProperties(roomDto, roomEntity);
