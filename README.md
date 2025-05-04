@@ -17,4 +17,6 @@ dotnet tool install --global dotnet-ef
 
 dotnet run
 
+ Aplikacja uruchomi się na otwartym porcie np
+ Now listening on: http://localhost:5183
  
