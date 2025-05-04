@@ -72,13 +72,11 @@ namespace RoomReservation.API.Controllers
         /// <response code="400">Validation error</response>
         /// <response code="403">User is forbidden</response>
         /// <response code="404">Room not found</response>
-        /// <response code="409">Room with this name exists</response>
         /// <response code="422">Reservation cannot be proceed </response>
         [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(Result), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(Result), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(Result), StatusCodes.Status422UnprocessableEntity)]
         [HttpPatch("Update")]
         public async Task<IActionResult> Update([FromBody] UpdateReservationRequest updateReservationRequest)
