@@ -38,7 +38,8 @@ namespace RoomReservation.Infrastructure.Repositories
                 return true;
 
             var durationMinutes = (endDate - startDate).TotalMinutes;
-            return (limit.MinTime == 0 || durationMinutes >= limit.MinTime) && (limit.MaxTime == 0 || durationMinutes <= limit.MaxTime);
+
+            return (!limit.MinTime.HasValue || limit.MinTime == 0 || durationMinutes >= limit.MinTime) && (!limit.MaxTime.HasValue || limit.MaxTime == 0 || durationMinutes <= limit.MaxTime);
         }
 
         private Result LogAndReturnFailure(string message, HttpStatusCode statusCode)
