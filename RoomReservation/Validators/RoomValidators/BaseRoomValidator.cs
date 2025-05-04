@@ -12,20 +12,21 @@ namespace RoomReservation.API.Validators.Room
     {
         public BaseRoomValidator()
         {
-            checkName();
+            CheckName();
             CheckTableCount();
             CheckRoomLayout();
-            checkRoomLimits();
+            CheckRoomLimits();
+            CheckCapacity();
         }
 
-        private void checkRoomLimits()
+        private void CheckRoomLimits()
         {
             When(x => x.RoomReservationLimit != null, () => {
                 RuleFor(x => x.RoomReservationLimit).SetValidator(new RoomReservationLimitsValidator()!);
             });
         }
 
-        private void checkName()
+        private void CheckName()
         {
             RuleFor(e => e.Name)
             .NotEmpty()
@@ -59,6 +60,12 @@ namespace RoomReservation.API.Validators.Room
                     .GreaterThan(1)
                     .WithMessage("Classroom layout requires more than one table.");
             });
+        }
+
+        private void CheckCapacity() {
+            RuleFor(e => e.Capacity)
+                .GreaterThan(0)
+                    .WithMessage("Capacity must be greater than 0.");
         }
 
  

@@ -16,7 +16,7 @@ namespace RoomReservation.Application.DTOs.Room
     public class RoomFilter
     {
         /// <summary>
-        /// Count of tables
+        /// Minimum table count
         /// </summary>
         /// <example>4</example>
         public int? TableCount { get; set; }
