@@ -7,10 +7,12 @@ using RoomReservation.Application.DTOs.Reservation.CreateReservation;
 using RoomReservation.Application.DTOs.Reservation.UpdateReservation;
 using RoomReservation.Application.DTOs.Room;
 using RoomReservation.Application.DTOs.Room.CreateRoom;
+using RoomReservation.Application.Enums;
 using RoomReservation.Application.Interfaces.Repositories;
 using RoomReservation.Application.Interfaces.Services;
 using RoomReservation.Application.Services;
 using RoomReservation.Domain.Entities;
+using RoomReservation.Domain.Enums;
 using RoomReservation.Shared.Common;
 using RoomReservation.Tests.ApplicationTests.Configurator;
 using RoomReservation.Tests.ApplicationTests.Configurators;
@@ -23,25 +25,31 @@ public class RoomServiceTest
 {
     private RoomService _service;
     private RoomSerivceTestsFixtures _fixture = null!;
-    private RoomServiceMockConfigurator _reservetionServiceMockConfigurator = null!;
+    private RoomServiceMockConfigurator _roomServiceMockConfigurator = null!;
 
     [SetUp]
     public void Setup()
     {
         _fixture = new RoomSerivceTestsFixtures();
         _service = _fixture.CreateService();
-        _reservetionServiceMockConfigurator = new RoomServiceMockConfigurator();
+        _roomServiceMockConfigurator = new RoomServiceMockConfigurator();
     }
 
     [Test]
-    public async Task CreateAsync_ShouldReturnSucess_And_Roomn_WhenRoomIsCreated()
+    public async Task CreateAsync_ShouldReturnSuccessAndRoom_WhenRoomIsCreated()
     {
-        var roomDto = new CreateRoomRequest()
+        var createRoomRequest = new CreateRoomRequest()
         {
             Name = "Room 1",
             Capacity = 10,
-            RoomEquipments = new List<CreateRoomEquipmentRequest>(),
-            RoomLayout = Domain.Enums.RoomLayoutEnum.Boardroom,
+            RoomEquipments = [
+                new()
+                {
+                    Quantity = 1,
+                    EquipmentType = EquipmentTypeEnum.Projector
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
             TableCount = 1,
             RoomReservationLimit = new RoomReservationLimitDto()
             {
@@ -50,12 +58,55 @@ public class RoomServiceTest
             }
 
         };
-        var reservationResult = Result<Reservation>.Success(reservation);
-        var rservationResultDto = Result<ReservationDto>.Success(reservationDto);
+        var room = new Room()
+        {
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                { Id =1,
+                    EquipmentId = 1,
+                    Quantity = 1,
+                    RoomId=1
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimit()
+            {
+                Id = 1,
+                RoomId = 1,
+                MaxTime = 60,
+                MinTime = 30
+            }
+        };
+        var roomDto = new RoomDto()
+        {
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                {
+                    Id =1,
+                    EquipmentType = EquipmentTypeEnum.Projector,
+                    Quantity = 1,
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimitDto()
+            {
+                MaxTime = 60,
+                MinTime = 30
+            }
+        };
 
-        _reservetionServiceMockConfigurator.SetupCreateSuccessfulReservation(_fixture, createReservationRequest, userId, reservationRequest, reservationResult, rservationResultDto);
 
-        var result = await _service.CreateAsync(roomDto);
+        _roomServiceMockConfigurator.SetupCreateRoomSuccessful(_fixture, createRoomRequest, room, roomDto);
+
+        var result = await _service.CreateAsync(createRoomRequest);
 
         result.ShouldNotBeNull();
         result.IsSuccess.ShouldBeTrue();
@@ -65,254 +116,416 @@ public class RoomServiceTest
     }
 
     [Test]
-    public async Task CreateAsync_ShouldReturnUnprocessableEntity_WhenRoomIsUnavailable()
+    public async Task CreateAsync_ShouldReturnUnprocessableEntity_WhenCreateError()
     {
-        var createReservationRequest = new CreateReservationRequest
+        var createRoomRequest = new CreateRoomRequest()
         {
-            StartDate = DateTime.Now,
-            EndDate = DateTime.Now.AddMinutes(60),
-            RoomId = 3
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+               new()
+                {
+                    Quantity = 1,
+                    EquipmentType = EquipmentTypeEnum.Projector
+                }
+           ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimitDto()
+            {
+                MaxTime = 60,
+                MinTime = 30
+            }
+
         };
-        var userId = 1;
-        var reservationRequest = new Reservation()
+        var room = new Room()
         {
-            Id = 0,
-            EndDate = createReservationRequest.EndDate,
-            StartDate = createReservationRequest.StartDate,
-            RoomId = createReservationRequest.RoomId,
-            UserId = userId
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                { Id =1,
+                    EquipmentId = 1,
+                    Quantity = 1,
+                    RoomId=1
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimit()
+            {
+                Id = 1,
+                RoomId = 1,
+                MaxTime = 60,
+                MinTime = 30
+            }
+        };
+        var roomDto = new RoomDto()
+        {
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                {
+                    Id =1,
+                    EquipmentType = EquipmentTypeEnum.Projector,
+                    Quantity = 1,
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimitDto()
+            {
+                MaxTime = 60,
+                MinTime = 30
+            }
         };
 
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenRoomUnavailable(_fixture, createReservationRequest, userId, reservationRequest);
+        _roomServiceMockConfigurator.SetupCreateRoomFailure(_fixture, createRoomRequest, room);
 
-        var result = await _service.CreateAsync(createReservationRequest, userId);
+        var result = await _service.CreateAsync(createRoomRequest);
 
         result.ShouldNotBeNull();
         result.IsSuccess.ShouldBeFalse();
-        result.FailureMessage.ShouldBe("Room is unavailable");
+        result.FailureMessage.ShouldBe("Create room failure");
         result.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableEntity);
     }
 
     [Test]
-    public async Task CreateAsync_ShouldReturnConflict_WhenUserIsNotAllowedToChangeReservation()
+    public async Task DeleteAsync_ShouldReturnSuccess_WhenRoomDeleted()
     {
-        var createReservationRequest = new CreateReservationRequest
-        {
-            StartDate = DateTime.Now,
-            EndDate = DateTime.Now.AddMinutes(60),
-            RoomId = 3
-        };
-        var userId = 1;
-        var reservationRequest = new Reservation()
-        {
-            Id = 0,
-            EndDate = createReservationRequest.EndDate,
-            StartDate = createReservationRequest.StartDate,
-            RoomId = createReservationRequest.RoomId,
-            UserId = userId
-        };
+        var roomId = 1;
 
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenUserHasAReservation(_fixture, createReservationRequest, userId, reservationRequest);
+        _roomServiceMockConfigurator.SetupDeleteRoomSuccessful(_fixture, roomId);
 
-        var result = await _service.CreateAsync(createReservationRequest, userId);
-
-        result.ShouldNotBeNull();
-        result.IsSuccess.ShouldBeFalse();
-        result.FailureMessage.ShouldBe($"User {userId} has already a reservation");
-        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.Conflict);
-    }
-
-    [Test]
-    public async Task UpdateAsync_ShouldReturnSucess_And_Reservation_WhenReservationIsUpdated()
-    {
-        var updateReservationRequest = new UpdateReservationRequest
-        {
-            StartDate = DateTime.Now,
-            EndDate = DateTime.Now.AddMinutes(60),
-            RoomId = 1,
-            Id = 1
-        };
-        var userId = 1;
-        var reservationRequest = new Reservation()
-        {
-            Id = 1,
-            EndDate = updateReservationRequest.EndDate,
-            StartDate = updateReservationRequest.StartDate,
-            RoomId = updateReservationRequest.RoomId,
-            UserId = userId
-        };
-        var reservation = new Reservation()
-        {
-            Id = 1,
-            EndDate = updateReservationRequest.EndDate,
-            StartDate = updateReservationRequest.StartDate,
-            RoomId = updateReservationRequest.RoomId,
-            UserId = userId
-        };
-        var reservationDto = new ReservationDto()
-        {
-            Id = 1,
-            EndDate = updateReservationRequest.EndDate,
-            StartDate = updateReservationRequest.StartDate,
-            RoomId = updateReservationRequest.RoomId,
-            UserId = userId
-        };
-
-        var reservationResult = Result<Reservation>.Success(reservation);
-        var rservationResultDto = Result<ReservationDto>.Success(reservationDto);
-
-        _reservetionServiceMockConfigurator.SetupUpdateSuccessfulReservation(_fixture, updateReservationRequest, userId, reservationRequest, reservationResult, rservationResultDto);
-
-        var result = (Result<ReservationDto>)await _service.UpdateAsync(updateReservationRequest, userId);
-
-        result.ShouldNotBeNull();
-        result.IsSuccess.ShouldBeTrue();
-        result.Data.ShouldNotBeNull();
-        result.Data.Id.ShouldBe(1);
-        result.FailureMessage.ShouldBeEmpty();
-    }
-
-    [Test]
-    public async Task UpdateAsync_ShouldReturnUnprocessableEntity_WhenRoomIsUnavailable()
-    {
-        var updateReservationRequest = new UpdateReservationRequest
-        {
-            StartDate = DateTime.Now,
-            EndDate = DateTime.Now.AddMinutes(60),
-            RoomId = 3,
-            Id = 1
-        };
-        var userId = 1;
-        var reservationRequest = new Reservation()
-        {
-            Id = 0,
-            EndDate = updateReservationRequest.EndDate,
-            StartDate = updateReservationRequest.StartDate,
-            RoomId = updateReservationRequest.RoomId,
-            UserId = userId
-        };
-
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenRoomUnavailable(_fixture, updateReservationRequest, userId, reservationRequest, updateReservationRequest.Id);
-
-        var result = await _service.UpdateAsync(updateReservationRequest, userId);
-
-        result.ShouldNotBeNull();
-        result.IsSuccess.ShouldBeFalse();
-        result.FailureMessage.ShouldBe("Room is unavailable");
-        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableEntity);
-    }
-
-    [Test]
-    public async Task UpdateAsync_ShouldReturnConflict_WhenUserIsNotAllowedToChangeReservation()
-    {
-        var updateReservationRequest = new UpdateReservationRequest
-        {
-            StartDate = DateTime.Now,
-            EndDate = DateTime.Now.AddMinutes(60),
-            RoomId = 3,
-            Id = 1
-        };
-        var userId = 1;
-        var reservationRequest = new Reservation()
-        {
-            Id = 0,
-            EndDate = updateReservationRequest.EndDate,
-            StartDate = updateReservationRequest.StartDate,
-            RoomId = updateReservationRequest.RoomId,
-            UserId = userId
-        };
-
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenUserHasAReservation(_fixture, updateReservationRequest, userId, reservationRequest, updateReservationRequest.Id);
-
-        var result = await _service.UpdateAsync(updateReservationRequest, userId);
-
-        result.ShouldNotBeNull();
-        result.IsSuccess.ShouldBeFalse();
-        result.FailureMessage.ShouldBe($"User {userId} has already a reservation");
-        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.Conflict);
-    }
-
-    [Test]
-    public async Task DeleteAsync_ShouldReturnSuccess_WhenReservationIsDeleted()
-    {
-        var reservationId = 1;
-        var userId = 1;
-
-        _reservetionServiceMockConfigurator.SetupDeleteSuccessfulReservation(_fixture, reservationId, userId);
-
-        var result = await _service.DeleteAsync(reservationId, userId);
+        var result = await _service.DeleteAsync(roomId);
 
         result.ShouldNotBeNull();
         result.IsSuccess.ShouldBeTrue();
         result.FailureMessage.ShouldBeEmpty();
+        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
     }
 
     [Test]
-    public async Task DeleteAsync_ShouldReturnBadRequest_WhenRepositoryCantDeleteUser()
+    public async Task DeleteAsync_ShouldReturnUnprocessableEntity_WhenDeleteError()
     {
-        var reservationId = 1;
-        var userId = 1;
+        var roomId = 1;
 
-        _reservetionServiceMockConfigurator.SetupDeleteBadRequestReservation(_fixture, reservationId, userId);
+        _roomServiceMockConfigurator.SetupDeleteRoomFailure(_fixture, roomId);
 
-        var result = await _service.DeleteAsync(reservationId, userId);
+        var result = await _service.DeleteAsync(roomId);
 
         result.ShouldNotBeNull();
         result.IsSuccess.ShouldBeFalse();
         result.FailureMessage.ShouldBe("Delete room failure");
+        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableEntity);
     }
 
     [Test]
-    public async Task GetListAsync_ShouldReturnList()
+    public async Task UpdateAsync_ShouldReturnSuccessAndRoom_WhenRoomIsUpdated()
     {
-        var reservations = new List<Reservation>()
+        var roomDto = new RoomDto()
         {
-            new Reservation()
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                {
+                    Quantity = 1,
+                    EquipmentType = EquipmentTypeEnum.Projector
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimitDto()
             {
-                EndDate = DateTime.Now.AddMinutes(60),
-                StartDate = DateTime.Now,
-                RoomId = 1,
-                UserId = 1,
-                Id = 1
-            },
-            new Reservation()
-            {
-                EndDate = DateTime.Now.AddMinutes(90),
-                StartDate = DateTime.Now,
-                RoomId = 2,
-                UserId = 2,
-                Id = 2
+                MaxTime = 60,
+                MinTime = 30
             }
-        }; var reservationsDto = new List<ReservationDto>()
+
+        };
+        var room = new Room()
         {
-            new ReservationDto()
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                {
+                    Id = 1,
+                    EquipmentId = 1,
+                    Quantity = 1,
+                    RoomId=1
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimit()
             {
-                EndDate = DateTime.Now.AddMinutes(60),
-                StartDate = DateTime.Now,
+                Id = 1,
                 RoomId = 1,
-                UserId = 1,
-                Id = 1
-            },
-            new ReservationDto()
-            {
-                EndDate = DateTime.Now.AddMinutes(90),
-                StartDate = DateTime.Now,
-                RoomId = 2,
-                UserId = 2,
-                Id = 2
+                MaxTime = 60,
+                MinTime = 30
             }
         };
 
-        var reservationsResult = Result<List<Reservation>>.Success(reservations);
-        var rservationsResultDto = Result<List<ReservationDto>>.Success(reservationsDto);
-        _reservetionServiceMockConfigurator.SetupGetReservationsSuccessful(_fixture, reservationsResult, rservationsResultDto);
+        _roomServiceMockConfigurator.SetupUpdateRoomSuccessful(_fixture, roomDto, room);
 
-        var result = await _service.GetListAsync();
+        var result = await _service.UpdateAsync(roomDto);
+
+        result.ShouldNotBeNull();
+        result.IsSuccess.ShouldBeTrue();
+        result.Data.ShouldNotBeNull();
+        result.Data.Id.ShouldBe(1);
+        result.FailureMessage.ShouldBeEmpty();
+    }
+
+    [Test]
+    public async Task UpdateAsync_ShouldReturnUnprocessableEntity_WhenUpdateError()
+    {
+        var room = new Room()
+        {
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                { Id =1,
+                    EquipmentId = 1,
+                    Quantity = 1,
+                    RoomId=1
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimit()
+            {
+                Id = 1,
+                RoomId = 1,
+                MaxTime = 60,
+                MinTime = 30
+            }
+        };
+        var roomDto = new RoomDto()
+        {
+            Id = 1,
+            Name = "Room 1",
+            Capacity = 10,
+            RoomEquipments = [
+                new()
+                {
+                    Id =1,
+                    EquipmentType = EquipmentTypeEnum.Projector,
+                    Quantity = 1,
+                }
+            ],
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1,
+            RoomReservationLimit = new RoomReservationLimitDto()
+            {
+                MaxTime = 60,
+                MinTime = 30
+            }
+        };
+
+        _roomServiceMockConfigurator.SetupUpdateRoomFailure(_fixture, roomDto, room);
+
+        var result = await _service.UpdateAsync(roomDto);
+
+        result.ShouldNotBeNull();
+        result.IsSuccess.ShouldBeFalse();
+        result.FailureMessage.ShouldBe("Update room failure");
+        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Test]
+    public async Task GetListAsync_ShouldReturnSuccess()
+    {
+        var roomFilters = new RoomFilter()
+        {
+            Name = "Room 1",
+            Capacity = 10,
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1
+        };
+        var rooms = new List<Room>()
+        {
+            new Room()
+            {
+                Id = 1,
+                Name = "Room 1",
+                Capacity = 10,
+                RoomEquipments = [
+                    new()
+                    {
+                        Id =1,
+                        EquipmentId = 1,
+                        Quantity = 1,
+                        RoomId=1
+                    }
+                ],
+                RoomLayout = RoomLayoutEnum.Boardroom,
+                TableCount = 1,
+                RoomReservationLimit = new RoomReservationLimit()
+                {
+                    Id = 1,
+                    RoomId = 1,
+                    MaxTime = 60,
+                    MinTime = 30
+                }
+            }
+        };
+        var roomsDto = new List<RoomDto>() 
+        {
+            new RoomDto()
+            {
+                Id = 1,
+                Name = "Room 1",
+                Capacity = 10,
+                RoomEquipments = [
+                    new()
+                    {
+                        Id =1,
+                        EquipmentType = EquipmentTypeEnum.Projector,
+                        Quantity = 1,
+                    }
+                ],
+                RoomLayout = RoomLayoutEnum.Boardroom,
+                TableCount = 1,
+                RoomReservationLimit = new RoomReservationLimitDto()
+                {
+                    MaxTime = 60,
+                    MinTime = 30
+                }
+            }
+        };
+        _roomServiceMockConfigurator.SetupGetRoomListSuccessful(_fixture, rooms, roomsDto, roomFilters);
+
+        var result = await _service.GetListAsync(roomFilters);
 
         result.ShouldNotBeNull();
         result.IsSuccess.ShouldBeTrue();
         result.FailureMessage.ShouldBeEmpty();
+        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
         result.Data.ShouldNotBeNull();
-        result.Data.Count.ShouldBe(2);
+        result.Data.Count.ShouldBe(1);
     }
+
+    [Test]
+    public async Task GetListAsync_ShouldReturnFailure()
+    {
+        var roomFilters = new RoomFilter()
+        {
+            Name = "Room 1",
+            Capacity = 10,
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1
+        };
+        _roomServiceMockConfigurator.SetupGetRoomListFailure(_fixture, roomFilters);
+
+        var result = await _service.GetListAsync(roomFilters);
+
+        result.ShouldNotBeNull();
+        result.IsSuccess.ShouldBeFalse();
+        result.FailureMessage.ShouldBe("Get room list failure");
+        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableEntity);
+    }
+    [Test]
+    public async Task GetAvailibiltyRoomsAsync_ShouldReturnSuccess()
+    {
+        var roomFilters = new RoomAvalibilityRequest()
+        {
+            AvailableFrom = DateTime.Now,
+            AvailableTo = DateTime.Now.AddHours(1),
+            Name = "Room 1",
+            Capacity = 10,
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1
+        };
+        var rooms = new List<Room>()
+        {
+            new Room()
+            {
+                Id = 1,
+                Name = "Room 1",
+                Capacity = 10,
+                RoomEquipments = [
+                    new()
+                    {
+                        Id =1,
+                        EquipmentId = 1,
+                        Quantity = 1,
+                        RoomId=1
+                    }
+                ],
+                RoomLayout = RoomLayoutEnum.Boardroom,
+                TableCount = 1,
+                RoomReservationLimit = new RoomReservationLimit()
+                {
+                    Id = 1,
+                    RoomId = 1,
+                    MaxTime = 60,
+                    MinTime = 30
+                }
+            }
+        };
+        var roomsDto = new List<RoomDto>()
+        {
+            new RoomDto()
+            {
+                Id = 1,
+                Name = "Room 1",
+                Capacity = 10,
+                RoomEquipments = [
+                    new()
+                    {
+                        Id =1,
+                        EquipmentType = EquipmentTypeEnum.Projector,
+                        Quantity = 1,
+                    }
+                ],
+                RoomLayout = RoomLayoutEnum.Boardroom,
+                TableCount = 1,
+                RoomReservationLimit = new RoomReservationLimitDto()
+                {
+                    MaxTime = 60,
+                    MinTime = 30
+                }
+            }
+        };
+        _roomServiceMockConfigurator.SetupGetAvailbityRoomsSuccessful(_fixture, rooms, roomsDto, roomFilters);
+
+        var result = await _service.GetAvalibilityRoomAsync(roomFilters);
+
+        result.ShouldNotBeNull();
+        result.IsSuccess.ShouldBeTrue();
+        result.FailureMessage.ShouldBeEmpty();
+        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.OK);
+        result.Data.ShouldNotBeNull();
+        result.Data.Count.ShouldBe(1);
+    }
+
+    [Test]
+    public async Task GetAvailibiltyRoomsAsync_ShouldReturnFailure()
+    {
+        var roomFilters = new RoomAvalibilityRequest()
+        {
+            Name = "Room 1",
+            Capacity = 10,
+            RoomLayout = RoomLayoutEnum.Boardroom,
+            TableCount = 1
+        };
+        _roomServiceMockConfigurator.SetupAvailibityRoomsFailure(_fixture, roomFilters);
+
+        var result = await _service.GetAvalibilityRoomAsync(roomFilters);
+
+        result.ShouldNotBeNull();
+        result.IsSuccess.ShouldBeFalse();
+        result.FailureMessage.ShouldBe("Get room list failure");
+        result.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableEntity);
+    }
+
 }

@@ -19,18 +19,18 @@ public class ReservationServiceTests
 {
     private ReservationService _service;
     private ReservationServiceTestsFixtures _fixture = null!;
-    private ReservationServiceMockConfigurator _reservetionServiceMockConfigurator = null!;
+    private ReservationServiceMockConfigurator _reservationServiceMockConfigurator = null!;
 
     [SetUp]
     public void Setup()
     {
         _fixture = new ReservationServiceTestsFixtures();
         _service = _fixture.CreateService();
-        _reservetionServiceMockConfigurator = new ReservationServiceMockConfigurator();
+        _reservationServiceMockConfigurator = new ReservationServiceMockConfigurator();
     }
 
     [Test]
-    public async Task CreateAsync_ShouldReturnSucess_And_Reservation_WhenReservationIsCreated()
+    public async Task CreateAsync_ShouldReturnSuccess_And_Reservation_WhenReservationIsCreated()
     {
         var createReservationRequest = new CreateReservationRequest
         {
@@ -67,7 +67,7 @@ public class ReservationServiceTests
         var reservationResult = Result<Reservation>.Success(reservation);
         var rservationResultDto = Result<ReservationDto>.Success(reservationDto);
 
-        _reservetionServiceMockConfigurator.SetupCreateSuccessfulReservation(_fixture, createReservationRequest, userId, reservationRequest, reservationResult, rservationResultDto);
+        _reservationServiceMockConfigurator.SetupCreateSuccessfulReservation(_fixture, createReservationRequest, userId, reservationRequest, reservationResult, rservationResultDto);
 
         var result = (Result<ReservationDto>)await _service.CreateAsync(createReservationRequest, userId);
 
@@ -97,7 +97,7 @@ public class ReservationServiceTests
             UserId = userId
         };
 
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenRoomUnavailable(_fixture, createReservationRequest, userId, reservationRequest);
+        _reservationServiceMockConfigurator.SetupUnprocessablyResultWhenRoomUnavailable(_fixture, createReservationRequest, userId, reservationRequest);
 
         var result = await _service.CreateAsync(createReservationRequest, userId);
 
@@ -126,7 +126,7 @@ public class ReservationServiceTests
             UserId = userId
         };
 
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenUserHasAReservation(_fixture, createReservationRequest, userId, reservationRequest);
+        _reservationServiceMockConfigurator.SetupUnprocessablyResultWhenUserHasAReservation(_fixture, createReservationRequest, userId, reservationRequest);
 
         var result = await _service.CreateAsync(createReservationRequest, userId);
 
@@ -137,7 +137,7 @@ public class ReservationServiceTests
     }
 
     [Test]
-    public async Task UpdateAsync_ShouldReturnSucess_And_Reservation_WhenReservationIsUpdated()
+    public async Task UpdateAsync_ShouldReturnSucessAndReservation_WhenReservationIsUpdated()
     {
         var updateReservationRequest = new UpdateReservationRequest
         {
@@ -175,7 +175,7 @@ public class ReservationServiceTests
         var reservationResult = Result<Reservation>.Success(reservation);
         var rservationResultDto = Result<ReservationDto>.Success(reservationDto);
 
-        _reservetionServiceMockConfigurator.SetupUpdateSuccessfulReservation(_fixture, updateReservationRequest, userId, reservationRequest, reservationResult, rservationResultDto);
+        _reservationServiceMockConfigurator.SetupUpdateSuccessfulReservation(_fixture, updateReservationRequest, userId, reservationRequest, reservationResult, rservationResultDto);
 
         var result = (Result<ReservationDto>) await _service.UpdateAsync(updateReservationRequest, userId);
 
@@ -206,7 +206,7 @@ public class ReservationServiceTests
             UserId = userId
         };
 
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenRoomUnavailable(_fixture, updateReservationRequest, userId, reservationRequest, updateReservationRequest.Id);
+        _reservationServiceMockConfigurator.SetupUnprocessablyResultWhenRoomUnavailable(_fixture, updateReservationRequest, userId, reservationRequest, updateReservationRequest.Id);
 
         var result = await _service.UpdateAsync(updateReservationRequest, userId);
 
@@ -236,7 +236,7 @@ public class ReservationServiceTests
             UserId = userId
         };
 
-        _reservetionServiceMockConfigurator.SetupUnprocessablyResultWhenUserHasAReservation(_fixture, updateReservationRequest, userId, reservationRequest, updateReservationRequest.Id);
+        _reservationServiceMockConfigurator.SetupUnprocessablyResultWhenUserHasAReservation(_fixture, updateReservationRequest, userId, reservationRequest, updateReservationRequest.Id);
 
         var result = await _service.UpdateAsync(updateReservationRequest, userId);
 
@@ -252,7 +252,7 @@ public class ReservationServiceTests
         var reservationId = 1;
         var userId = 1;
 
-        _reservetionServiceMockConfigurator.SetupDeleteSuccessfulReservation(_fixture, reservationId, userId);
+        _reservationServiceMockConfigurator.SetupDeleteSuccessfulReservation(_fixture, reservationId, userId);
 
         var result = await _service.DeleteAsync(reservationId, userId);
 
@@ -267,7 +267,7 @@ public class ReservationServiceTests
         var reservationId = 1;
         var userId = 1;
 
-        _reservetionServiceMockConfigurator.SetupDeleteBadRequestReservation(_fixture, reservationId, userId);
+        _reservationServiceMockConfigurator.SetupDeleteBadRequestReservation(_fixture, reservationId, userId);
 
         var result = await _service.DeleteAsync(reservationId, userId);
 
@@ -319,7 +319,7 @@ public class ReservationServiceTests
 
         var reservationsResult = Result<List<Reservation>>.Success(reservations);
         var rservationsResultDto = Result<List<ReservationDto>>.Success(reservationsDto);
-        _reservetionServiceMockConfigurator.SetupGetReservationsSuccessful(_fixture, reservationsResult, rservationsResultDto);
+        _reservationServiceMockConfigurator.SetupGetReservationsSuccessful(_fixture, reservationsResult, rservationsResultDto);
 
         var result = await _service.GetListAsync();
 

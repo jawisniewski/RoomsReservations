@@ -13,19 +13,19 @@ namespace RoomReservation.Tests.ApplicationTests.Fixtures
 {
     public class ReservationServiceTestsFixtures
     {
-            public Mock<IMapper> MapperMock { get; } = new();
-            public Mock<IRoomRepository> RoomRepositoryMock { get; } = new();
-            public Mock<IReservationRepository> ReservationRepositoryMock { get; } = new();
-            public Mock<ILogger<ReservationService>> LoggerMock { get; } = new();
+        public Mock<IMapper> MapperMock { get; } = new();
+        public Mock<IRoomRepository> RoomRepositoryMock { get; } = new();
+        public Mock<IReservationRepository> ReservationRepositoryMock { get; } = new();
+        public Mock<ILogger<ReservationService>> LoggerMock { get; } = new();
 
-            public ReservationService CreateService()
-            {
-                return new ReservationService(
-                    MapperMock.Object,
-                    ReservationRepositoryMock.Object,
-                    RoomRepositoryMock.Object,
-                    LoggerMock.Object
-                );
-            }        
+        public ReservationService CreateService()
+        {
+            return new ReservationService(
+                MapperMock.Object,
+                ReservationRepositoryMock.Object,
+                RoomRepositoryMock.Object,
+                LoggerMock.Object
+            );
+        }
     }
 }
