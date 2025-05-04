@@ -17,7 +17,7 @@ namespace RoomReservation.Application.DTOs.Reservation
         /// <summary>
         /// Start of the reservation must be in the future 
         /// </summary>
-        /// <example>2025.06.04T10:00</example>
+        /// <example>2025-06-04T10:00</example>
         public required DateTime StartDate
         {
             get { return _startDate; }
@@ -27,7 +27,7 @@ namespace RoomReservation.Application.DTOs.Reservation
         /// <summary>
         /// End of the reservation must be in the future and after start date
         /// </summary>
-        /// <example>2025.06.04T11:00</example>
+        /// <example>2025-06-04T11:00</example>
         public required DateTime EndDate
         {
             get { return _endDate; }
