@@ -2,7 +2,7 @@
 ## Wymagania
 - Net SDK 8 + https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 - Baza danych SQLServer
-- jeżeli nie istnieje narzędzie dotnet ef należy je najpierw zainstalować za pomocą komendy
+- jeżeli nie istnieje narzędzie dotnet ef należy je zainstalować za pomocą komendy
 
 dotnet tool install --global dotnet-ef 
 ## Kroki uruchomieniowe programu
