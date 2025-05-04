@@ -284,9 +284,6 @@ namespace RoomReservation.Infrastructure.Repositories
                 if (room == null)
                     return LogAndReturnFailure($"Room not found {roomId}", HttpStatusCode.NotFound);
 
-                if (room.Reservations == null || !room.Reservations.Any())
-                    return Result.Success();
-
                 if (IsOverlappingReservation(room.Reservations, startDate, endDate, reservationId))
                     return LogAndReturnFailure($"Room {room.Name} reserved ", HttpStatusCode.UnprocessableEntity);
 
